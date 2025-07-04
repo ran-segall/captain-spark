@@ -12,7 +12,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<div>Landing Page Coming Soon</div>} />
+        <Route path="/" element={<div>Landing Page Is Coming Soon</div>} />
         <Route path="/onboarding" element={<Intro />} />
         <Route path="/onboarding/parent-name" element={<ParentName />} />
         <Route path="/onboarding/kid-name" element={<KidName />} />
