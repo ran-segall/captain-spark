@@ -1,5 +1,10 @@
 @import './styles/typography.css';
 
+html {
+  height: 100dvh;
+  overflow: hidden;
+}
+
 :root {
   font-family: 'Inter', sans-serif;
   line-height: 1.4;
