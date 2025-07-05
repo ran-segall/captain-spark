@@ -1,8 +1,9 @@
+import AppLayout from '../../components/ScreenLayout';
 import OnboardingLayout from '../../components/ScreenLayout';
 
 function Intro() {
   return (
-    <OnboardingLayout>
+    <AppLayout>
       <div
         style={{
           padding: '2rem',
@@ -70,7 +71,7 @@ function Intro() {
           </button>
         </div>
       </div>
-    </OnboardingLayout>
+    </AppLayout>
   );
 }
 
