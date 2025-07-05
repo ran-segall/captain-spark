@@ -1,5 +1,4 @@
 import AppLayout from '../../components/ScreenLayout';
-import OnboardingLayout from '../../components/ScreenLayout';
 
 function Intro() {
   return (
