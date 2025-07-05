@@ -1,7 +1,7 @@
 @import './styles/typography.css';
 
 html {
-  height: 100dvh;
+  height: 100svh;
   overflow: hidden;
 }
 
@@ -35,7 +35,7 @@ body {
   display: flex;
   place-items: center;
   min-width: 320px;
-  max-height: 100dvh;
+  max-height: 100svh;
 }
 
 /* Mobile styles - remove flex centering */
