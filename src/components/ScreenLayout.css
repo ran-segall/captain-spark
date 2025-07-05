@@ -29,5 +29,6 @@
   .app-wrapper {
     border-radius: 0;
     height: 100dvh;
+    box-shadow: 0 0 0 rgba(0,0,0,0.04);
   }
 } 
