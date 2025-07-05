@@ -1,11 +1,11 @@
 .page-wrapper {
   background-color: #f3f3f3;
   width: 100vw;
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
+  padding: 2rem 2rem 4rem 2rem;
   box-sizing: border-box;
 }
 
