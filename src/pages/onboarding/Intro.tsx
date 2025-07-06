@@ -25,7 +25,7 @@ function Intro() {
             maxWidth: '80%',
             maxHeight: '40vh',
             objectFit: 'contain',
-            margin: '1rem 0',
+            margin: '0',
           }}
         />
 
