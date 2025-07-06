@@ -4,9 +4,10 @@ interface VideoPlayerProps {
   src: string;
   onFinished?: () => void;
   onProgress?: (currentTime: number, duration: number) => void;
+  onProgressUpdate?: (progress: number) => void; // 0 to 1
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, onFinished, onProgress }) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, onFinished, onProgress, onProgressUpdate }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -16,6 +17,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, onFinished, onProgress }
     const handleTimeUpdate = () => {
       if (onProgress) {
         onProgress(video.currentTime, video.duration);
+      }
+      
+      if (onProgressUpdate && video.duration > 0) {
+        const progress = video.currentTime / video.duration;
+        onProgressUpdate(progress);
       }
     };
 
@@ -32,7 +38,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, onFinished, onProgress }
       video.removeEventListener('timeupdate', handleTimeUpdate);
       video.removeEventListener('ended', handleEnded);
     };
-  }, [onProgress, onFinished]);
+  }, [onProgress, onProgressUpdate, onFinished]);
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const video = videoRef.current;
