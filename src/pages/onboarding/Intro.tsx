@@ -1,4 +1,5 @@
 import AppLayout from '../../components/ScreenLayout';
+import Button from '../../components/Button';
 
 function Intro() {
   return (
@@ -14,7 +15,7 @@ function Intro() {
           textAlign: 'center',
         }}
       >
-        <h1 style={{ fontSize: '2.4rem', fontWeight: 800, color: '#1f2d3d' }}>
+        <h1 style={{ fontSize: '2.4rem', fontWeight: 900, letterSpacing: '-0.06rem', color: '#1f2d3d' }}>
           Captain Spark
         </h1>
 
@@ -38,36 +39,10 @@ function Intro() {
         </p>
 
         <div style={{ marginTop: 'auto', width: '100%' }}>
-          <button
-            style={{
-              background: '#FFA927',
-              border: 'none',
-              color: 'white',
-              width: '100%',
-              padding: '0.75rem',
-              fontSize: '1rem',
-              borderRadius: '9999px',
-              marginBottom: '1rem',
-              cursor: 'pointer',
-            }}
-          >
-            Get Started
-          </button>
-
-          <button
-            style={{
-              background: '#f8f4f1',
-              border: 'none',
-              color: '#1f2d3d',
-              width: '100%',
-              padding: '0.75rem',
-              fontSize: '1rem',
-              borderRadius: '9999px',
-              cursor: 'pointer',
-            }}
-          >
-            Log In
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <Button variant="primary">Get Started</Button>
+            <Button variant="secondary">Log In</Button>
+          </div>
         </div>
       </div>
     </AppLayout>
