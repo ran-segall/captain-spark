@@ -52,6 +52,12 @@ function Intro() {
           </div>
         </div>
       </div>
+      {/* Preload video invisibly */}
+    <video
+      src="/videos/onboarding/Onboarding-1-HB.mp4"
+      preload="auto"
+      style={{ display: 'none' }}
+    />
     </AppLayout>
   );
 }
