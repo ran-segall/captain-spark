@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/ScreenLayout';
 import VideoPlayer from '../../components/VideoPlayer';
 import ProgressBar from '../../components/ProgressBar';
+import BackIcon from '../../assets/icons/back-icon-video.svg';
 
 function VideoIntro() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [progress, setProgress] = useState(0);
 
   const handleProgress = (currentTime: number, duration: number) => {
@@ -31,6 +33,22 @@ function VideoIntro() {
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', zIndex: 2 }}>
           <div style={{ margin: '2rem' }}>
             <ProgressBar progress={progress} />
+            <button
+              onClick={() => navigate(-1)}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                marginTop: '1.5rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                boxShadow: 'none',
+              }}
+              aria-label="Back"
+            >
+              <img src={BackIcon} alt="Back" style={{ width: 24, height: 24 }} />
+            </button>
           </div>
         </div>
         <VideoPlayer
