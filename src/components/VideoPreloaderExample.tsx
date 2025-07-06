@@ -1,4 +1,3 @@
-import React from 'react';
 import { usePreloadVideo, usePreloadMultipleVideos } from '../hooks/useVideoPreloader';
 
 // Example 1: Preload a single video for a specific page

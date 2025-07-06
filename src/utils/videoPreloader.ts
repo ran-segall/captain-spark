@@ -68,7 +68,7 @@ class VideoPreloader {
         resolve();
       };
 
-      const handleError = (error: Event) => {
+      const handleError = () => {
         reject(new Error(`Failed to preload video: ${src}`));
       };
 
