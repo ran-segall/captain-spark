@@ -65,6 +65,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, onFinished, onProgress }
         ref={videoRef}
         src={src}
         muted={false}
+        playsInline
         style={{
             width: '100%',
             height: '100%',
