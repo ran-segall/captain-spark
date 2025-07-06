@@ -1,7 +1,14 @@
 import AppLayout from '../../components/ScreenLayout';
 import Button from '../../components/Button';
+import { useNavigate } from 'react-router-dom';
 
 function Intro() {
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    navigate('/onboarding/video-intro', { state: { interacted: true } });
+  };
+
   return (
     <AppLayout>
       <div
@@ -40,7 +47,7 @@ function Intro() {
 
         <div style={{ marginTop: 'auto', width: '100%' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <Button variant="primary">Get Started</Button>
+            <Button variant="primary" onClick={handleGetStarted}>Get Started</Button>
             <Button variant="secondary">Log In</Button>
           </div>
         </div>
