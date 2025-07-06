@@ -1,13 +1,50 @@
 import AppLayout from '../../components/ScreenLayout';
 import Button from '../../components/Button';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import videoPreloader from '../../utils/videoPreloader';
+import { VIDEO_PATHS } from '../../utils/videoPaths';
 
 function Intro() {
   const navigate = useNavigate();
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleGetStarted = () => {
     navigate('/onboarding/video-intro', { state: { interacted: true } });
   };
+
+  // Enhanced preloading for mobile
+  useEffect(() => {
+    const videoSrc = VIDEO_PATHS.ONBOARDING.INTRO;
+    
+    // Use the video preloader utility
+    videoPreloader.preloadVideo(videoSrc).catch(error => {
+      console.warn('Video preload failed:', error);
+    });
+
+    // Also keep the original preload as fallback
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Set up aggressive preloading
+    video.preload = 'auto';
+    video.muted = false; // Keep audio for critical app functionality
+    video.playsInline = true;
+    
+    // Force load the video data
+    const loadVideo = async () => {
+      try {
+        await video.load();
+        // Start loading the video data
+        video.currentTime = 0.1; // Seek to a small time to trigger loading
+        video.currentTime = 0; // Reset to beginning
+      } catch (error) {
+        console.log('Video preload error:', error);
+      }
+    };
+
+    loadVideo();
+  }, []);
 
   return (
     <AppLayout>
@@ -52,12 +89,21 @@ function Intro() {
           </div>
         </div>
       </div>
-      {/* Preload video invisibly */}
-    <video
-      src="/videos/onboarding/Onboarding-1-HB.mp4"
-      preload="auto"
-      style={{ display: 'none' }}
-    />
+      
+      {/* Enhanced preload video */}
+      <video
+        ref={videoRef}
+        src={VIDEO_PATHS.ONBOARDING.INTRO}
+        preload="auto"
+        muted={false}
+        playsInline
+        style={{ 
+          display: 'none',
+          position: 'absolute',
+          top: '-9999px',
+          left: '-9999px'
+        }}
+      />
     </AppLayout>
   );
 }

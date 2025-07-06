@@ -1,14 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/ScreenLayout';
 import VideoPlayer from '../../components/VideoPlayer';
 import ProgressBar from '../../components/ProgressBar';
 import BackIcon from '../../assets/icons/back-icon-video.svg';
+import videoPreloader from '../../utils/videoPreloader';
 
 function VideoIntro() {
   const location = useLocation();
   const navigate = useNavigate();
   const [progress, setProgress] = useState(0);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleProgress = (currentTime: number, duration: number) => {
     console.log(`Video progress: ${currentTime.toFixed(2)}s / ${duration.toFixed(2)}s`);
@@ -18,11 +21,43 @@ function VideoIntro() {
     setProgress(progressValue);
   };
 
+  const handleVideoReady = () => {
+    setIsVideoReady(true);
+  };
+
   useEffect(() => {
-    if (location.state?.interacted) {
-      const videoElement = document.querySelector('video');
-      if (videoElement) {
-        videoElement.play();
+    const videoSrc = '/videos/onboarding/Onboarding-1-HB.mp4';
+    
+    // Check if video is already preloaded
+    if (videoPreloader.isVideoReady(videoSrc)) {
+      setIsVideoReady(true);
+      if (location.state?.interacted) {
+        setTimeout(() => {
+          const videoElement = document.querySelector('video');
+          if (videoElement) {
+            videoElement.play();
+          }
+        }, 50); // Reduced delay for faster start
+      }
+    } else {
+      // Video needs to load, set up loading state
+      const video = videoRef.current;
+      if (video) {
+        const handleCanPlay = () => {
+          setIsVideoReady(true);
+          if (location.state?.interacted) {
+            video.play();
+          }
+        };
+
+        video.addEventListener('canplay', handleCanPlay);
+        
+        // Also try to start loading immediately
+        video.load();
+        
+        return () => {
+          video.removeEventListener('canplay', handleCanPlay);
+        };
       }
     }
   }, [location.state?.interacted]);
@@ -51,10 +86,31 @@ function VideoIntro() {
             </button>
           </div>
         </div>
+        
+        {/* Show loading state if video isn't ready */}
+        {!isVideoReady && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1
+          }}>
+            <div style={{ color: '#fff', fontSize: '1.2rem' }}>Loading...</div>
+          </div>
+        )}
+        
         <VideoPlayer
+          ref={videoRef}
           src="/videos/onboarding/Onboarding-1-HB.mp4"
           onProgress={handleProgress}
           onProgressUpdate={handleProgressUpdate}
+          onReady={handleVideoReady}
         />
       </div>
     </AppLayout>
