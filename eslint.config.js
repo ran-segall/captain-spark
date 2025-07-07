@@ -20,8 +20,14 @@ export default tseslint.config([
       globals: globals.browser,
     },
     rules: {
-      'no-unused-vars': ['error', { vars: 'all', args: 'after-used', ignoreRestSiblings: false }],
-      '@typescript-eslint/no-unused-vars': ['error'],
+      'no-unused-vars': [
+        'error',
+        { vars: 'all', args: 'after-used', ignoreRestSiblings: false, varsIgnorePattern: '^_', argsIgnorePattern: '^_' }
+      ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { varsIgnorePattern: '^_', argsIgnorePattern: '^_' }
+      ],
     },
   },
 ])

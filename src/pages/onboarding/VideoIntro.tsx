@@ -25,6 +25,10 @@ function VideoIntro() {
     setIsVideoReady(true);
   };
 
+  const handleVideoEnd = () => {
+    navigate('/onboarding/parent-name');
+  };
+
   useEffect(() => {
     const videoSrc = '/videos/onboarding/Onboarding-1-HB.mp4';
     
@@ -64,7 +68,7 @@ function VideoIntro() {
 
   return (
     <AppLayout>
-      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', zIndex: 2 }}>
           <div style={{ margin: '2rem' }}>
             <ProgressBar progress={progress} />
@@ -105,13 +109,16 @@ function VideoIntro() {
           </div>
         )}
         
-        <VideoPlayer
-          ref={videoRef}
-          src="/videos/onboarding/Onboarding-1-HB.mp4"
-          onProgress={handleProgress}
-          onProgressUpdate={handleProgressUpdate}
-          onReady={handleVideoReady}
-        />
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <VideoPlayer
+            ref={videoRef}
+            src="/videos/onboarding/Onboarding-1-HB.mp4"
+            onProgress={handleProgress}
+            onProgressUpdate={handleProgressUpdate}
+            onReady={handleVideoReady}
+            onFinished={handleVideoEnd}
+          />
+        </div>
       </div>
     </AppLayout>
   );
