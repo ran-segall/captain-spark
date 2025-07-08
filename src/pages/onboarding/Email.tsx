@@ -51,13 +51,13 @@ const Email = () => {
       const kidAudioFilename = `kid-audio-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
 
       // Upload parent audio
-      const { data: parentAudioData, error: parentAudioError } = await supabase.storage
+      const { error: parentAudioError } = await supabase.storage
         .from('audio')
         .upload(parentAudioFilename, parentAudioBlob, { contentType: 'audio/mpeg' });
       if (parentAudioError) throw parentAudioError;
 
       // Upload kid audio
-      const { data: kidAudioData, error: kidAudioError } = await supabase.storage
+      const { error: kidAudioError } = await supabase.storage
         .from('audio')
         .upload(kidAudioFilename, kidAudioBlob, { contentType: 'audio/mpeg' });
       if (kidAudioError) throw kidAudioError;
