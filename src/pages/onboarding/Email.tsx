@@ -1,15 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/ScreenLayout';
 import OnboardingProgressBar from '../../components/OnboardingProgressBar';
 import Button from '../../components/Button';
 import BackIcon from '../../assets/icons/back-icon-blue.svg';
 import { supabase } from '../../utils/supabaseClient';
+import videoPreloader from '../../utils/videoPreloader';
+import { VIDEO_PATHS } from '../../utils/videoPaths';
 
 const Email = () => {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+
+  // Start preloading the next video when component mounts
+  useEffect(() => {
+    const nextVideoPath = VIDEO_PATHS.ONBOARDING.WELCOME_NO_NAMES;
+    videoPreloader.preloadVideo(nextVideoPath).catch(error => {
+      console.warn('Failed to preload video:', error);
+    });
+  }, []);
 
   const isValidEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -50,8 +60,8 @@ const Email = () => {
       localStorage.removeItem('childName');
       localStorage.removeItem('childAge');
 
-      // Navigate to personal welcome page
-      navigate('/onboarding/personal-welcome');
+      // Navigate to personal welcome page with interacted state
+      navigate('/onboarding/personal-welcome', { state: { interacted: true } });
     } catch (error) {
       console.error('Error submitting form:', error);
     } finally {

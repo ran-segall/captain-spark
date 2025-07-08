@@ -1,51 +1,128 @@
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/ScreenLayout';
-import Button from '../../components/Button';
+import VideoPlayer from '../../components/VideoPlayer';
+import ProgressBar from '../../components/ProgressBar';
+import BackIcon from '../../assets/icons/back-icon-video.svg';
+import videoPreloader from '../../utils/videoPreloader';
+import { VIDEO_PATHS } from '../../utils/videoPaths';
 
-const PersonalWelcome = () => {
+function PersonalWelcome() {
+  const location = useLocation();
   const navigate = useNavigate();
+  const [progress, setProgress] = useState(0);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  const handleGetStarted = () => {
-    // Navigate to the main app or next step
-    navigate('/dashboard'); // or wherever you want to go after onboarding
+  const handleProgress = (currentTime: number, duration: number) => {
+    console.log(`Video progress: ${currentTime.toFixed(2)}s / ${duration.toFixed(2)}s`);
   };
+
+  const handleProgressUpdate = (progressValue: number) => {
+    setProgress(progressValue);
+  };
+
+  const handleVideoReady = () => {
+    setIsVideoReady(true);
+  };
+
+  const handleVideoEnd = () => {
+    navigate('/onboarding/ready');
+  };
+
+  useEffect(() => {
+    const videoSrc = VIDEO_PATHS.ONBOARDING.WELCOME_NO_NAMES;
+    
+    // Check if video is already preloaded
+    if (videoPreloader.isVideoReady(videoSrc)) {
+      setIsVideoReady(true);
+      if (location.state?.interacted) {
+        setTimeout(() => {
+          const videoElement = document.querySelector('video');
+          if (videoElement) {
+            videoElement.play();
+          }
+        }, 50); // Reduced delay for faster start
+      }
+    } else {
+      // Video needs to load, set up loading state
+      const video = videoRef.current;
+      if (video) {
+        const handleCanPlay = () => {
+          setIsVideoReady(true);
+          if (location.state?.interacted) {
+            video.play();
+          }
+        };
+
+        video.addEventListener('canplay', handleCanPlay);
+        
+        // Also try to start loading immediately
+        video.load();
+        
+        return () => {
+          video.removeEventListener('canplay', handleCanPlay);
+        };
+      }
+    }
+  }, [location.state?.interacted]);
 
   return (
     <AppLayout>
-      <div
-        style={{
-          padding: '2rem',
-          width: '100%',
-          height: '100%',
-          minHeight: '650px',
-          display: 'flex',
-          flexDirection: 'column',
-          flex: 1,
-          boxSizing: 'border-box',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <div style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: '1.5rem', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '2rem', fontWeight: 900, color: '#163657', lineHeight: 1.1, margin: 0 }}>
-            Welcome to Captain Spark!
-          </h1>
-          <p style={{ fontSize: '1.1rem', color: '#666', lineHeight: 1.5, margin: 0 }}>
-            Your account has been created successfully. We're excited to help you and your child on this learning journey!
-          </p>
+      <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', zIndex: 2 }}>
+          <div style={{ margin: '2rem' }}>
+            <ProgressBar progress={progress} />
+            <button
+              onClick={() => navigate(-1)}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                marginTop: '1.5rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                boxShadow: 'none',
+              }}
+              aria-label="Back"
+            >
+              <img src={BackIcon} alt="Back" style={{ width: 24, height: 24 }} />
+            </button>
+          </div>
         </div>
-        <div style={{ width: '100%', maxWidth: 400, marginTop: '2rem' }}>
-          <Button
-            onClick={handleGetStarted}
-            variant="primary"
-            fullWidth
-          >
-            Get Started
-          </Button>
+        
+        {/* Show loading state if video isn't ready */}
+        {!isVideoReady && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1
+          }}>
+            <div style={{ color: '#fff', fontSize: '1.2rem' }}>Loading...</div>
+          </div>
+        )}
+        
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <VideoPlayer
+            ref={videoRef}
+            src={VIDEO_PATHS.ONBOARDING.WELCOME_NO_NAMES}
+            onProgress={handleProgress}
+            onProgressUpdate={handleProgressUpdate}
+            onReady={handleVideoReady}
+            onFinished={handleVideoEnd}
+          />
         </div>
       </div>
     </AppLayout>
   );
-};
+}
 
 export default PersonalWelcome; 

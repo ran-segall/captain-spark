@@ -5,6 +5,7 @@ import VideoPlayer from '../../components/VideoPlayer';
 import ProgressBar from '../../components/ProgressBar';
 import BackIcon from '../../assets/icons/back-icon-video.svg';
 import videoPreloader from '../../utils/videoPreloader';
+import { VIDEO_PATHS } from '../../utils/videoPaths';
 
 function VideoIntro() {
   const location = useLocation();
@@ -30,7 +31,7 @@ function VideoIntro() {
   };
 
   useEffect(() => {
-    const videoSrc = '/videos/onboarding/Onboarding-1-HB.mp4';
+    const videoSrc = VIDEO_PATHS.ONBOARDING.INTRO;
     
     // Check if video is already preloaded
     if (videoPreloader.isVideoReady(videoSrc)) {
@@ -112,7 +113,7 @@ function VideoIntro() {
         <div style={{ flex: 1, minHeight: 0 }}>
           <VideoPlayer
             ref={videoRef}
-            src="/videos/onboarding/Onboarding-1-HB.mp4"
+            src={VIDEO_PATHS.ONBOARDING.INTRO}
             onProgress={handleProgress}
             onProgressUpdate={handleProgressUpdate}
             onReady={handleVideoReady}
