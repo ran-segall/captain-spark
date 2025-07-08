@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/ScreenLayout';
 import VideoPlayer from '../../components/VideoPlayer';
@@ -13,6 +13,84 @@ function PersonalWelcome() {
   const [progress, setProgress] = useState(0);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const parentAudioRef = useRef<HTMLAudioElement | null>(null);
+  const kidAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [parentPlayed, setParentPlayed] = useState(false);
+  const [kidPlayed, setKidPlayed] = useState(false);
+  const [parentPlaying, setParentPlaying] = useState(false);
+  const [kidPlaying, setKidPlaying] = useState(false);
+
+  const parentAudioBlob = location.state?.parentAudioBlob;
+  const kidAudioBlob = location.state?.kidAudioBlob;
+
+  // Use useMemo to create object URLs only when blobs change
+  const parentAudioUrl = useMemo(
+    () => (parentAudioBlob ? URL.createObjectURL(parentAudioBlob) : null),
+    [parentAudioBlob]
+  );
+  const kidAudioUrl = useMemo(
+    () => (kidAudioBlob ? URL.createObjectURL(kidAudioBlob) : null),
+    [kidAudioBlob]
+  );
+
+  // Clean up object URLs on unmount or when blob changes
+  useEffect(() => {
+    return () => {
+      if (parentAudioUrl) URL.revokeObjectURL(parentAudioUrl);
+      if (kidAudioUrl) URL.revokeObjectURL(kidAudioUrl);
+    };
+  }, [parentAudioUrl, kidAudioUrl]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleTimeUpdate = () => {
+      const currentTime = video.currentTime;
+      if (!parentPlayed && !parentPlaying && parentAudioRef.current && currentTime >= 0.6) {
+        parentAudioRef.current.currentTime = 0;
+        setParentPlaying(true);
+        parentAudioRef.current.play()
+          .catch(e => console.error('Parent audio play error:', e));
+        setParentPlayed(true);
+      }
+      if (!kidPlayed && !kidPlaying && kidAudioRef.current && currentTime >= 2.4) {
+        kidAudioRef.current.currentTime = 0;
+        setKidPlaying(true);
+        kidAudioRef.current.play()
+          .catch(e => console.error('Kid audio play error:', e));
+        setKidPlayed(true);
+      }
+    };
+
+    const handleParentEnded = () => setParentPlaying(false);
+    const handleKidEnded = () => setKidPlaying(false);
+
+    if (parentAudioRef.current) {
+      parentAudioRef.current.addEventListener('ended', handleParentEnded);
+    }
+    if (kidAudioRef.current) {
+      kidAudioRef.current.addEventListener('ended', handleKidEnded);
+    }
+
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('play', () => {
+      setParentPlayed(false);
+      setKidPlayed(false);
+      setParentPlaying(false);
+      setKidPlaying(false);
+    });
+
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      if (parentAudioRef.current) {
+        parentAudioRef.current.removeEventListener('ended', handleParentEnded);
+      }
+      if (kidAudioRef.current) {
+        kidAudioRef.current.removeEventListener('ended', handleKidEnded);
+      }
+    };
+  }, [parentAudioUrl, kidAudioUrl, parentPlayed, kidPlayed, parentPlaying, kidPlaying]);
 
   const handleProgress = (currentTime: number, duration: number) => {
     console.log(`Video progress: ${currentTime.toFixed(2)}s / ${duration.toFixed(2)}s`);
@@ -27,7 +105,7 @@ function PersonalWelcome() {
   };
 
   const handleVideoEnd = () => {
-    navigate('/onboarding/ready');
+    // Do nothing for now
   };
 
   useEffect(() => {
@@ -74,7 +152,17 @@ function PersonalWelcome() {
           <div style={{ margin: '2rem' }}>
             <ProgressBar progress={progress} />
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => {
+                // Reset played state and restart video
+                setParentPlayed(false);
+                setKidPlayed(false);
+                setParentPlaying(false);
+                setKidPlaying(false);
+                if (videoRef.current) {
+                  videoRef.current.currentTime = 0;
+                  videoRef.current.play();
+                }
+              }}
               style={{
                 background: 'none',
                 border: 'none',
@@ -119,6 +207,12 @@ function PersonalWelcome() {
             onReady={handleVideoReady}
             onFinished={handleVideoEnd}
           />
+          {parentAudioUrl && (
+            <audio ref={parentAudioRef} src={parentAudioUrl} preload="auto" />
+          )}
+          {kidAudioUrl && (
+            <audio ref={kidAudioRef} src={kidAudioUrl} preload="auto" />
+          )}
         </div>
       </div>
     </AppLayout>
