@@ -18,9 +18,13 @@ function Intro() {
     const videoSrc = VIDEO_PATHS.ONBOARDING.INTRO;
     
     // Use the video preloader utility
-    videoPreloader.preloadVideo(videoSrc).catch(error => {
-      console.warn('Video preload failed:', error);
-    });
+    videoPreloader.preloadVideo(videoSrc)
+      .then(() => {
+        console.log('Intro: video preloader utility finished');
+      })
+      .catch(error => {
+        console.warn('Video preload failed:', error);
+      });
 
     // Also keep the original preload as fallback
     const video = videoRef.current;
@@ -38,6 +42,7 @@ function Intro() {
         // Start loading the video data
         video.currentTime = 0.1; // Seek to a small time to trigger loading
         video.currentTime = 0; // Reset to beginning
+        console.log('Intro: video element load finished');
       } catch (error) {
         console.log('Video preload error:', error);
       }

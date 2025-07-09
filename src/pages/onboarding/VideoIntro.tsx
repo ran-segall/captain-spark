@@ -40,6 +40,7 @@ const Spinner = () => (
 );
 
 function VideoIntro() {
+  console.log('VideoIntro mounted');
   const location = useLocation();
   const navigate = useNavigate();
   const [progress, setProgress] = useState(0);
@@ -99,6 +100,25 @@ function VideoIntro() {
     }
   }, [location.state?.interacted]);
 
+  // DEBUG: Top-level render test
+  // Uncomment to test if this is rendered immediately
+  // return (
+  //   <div style={{
+  //     background: 'yellow',
+  //     color: 'black',
+  //     width: '100vw',
+  //     height: '100dvh',
+  //     display: 'flex',
+  //     alignItems: 'center',
+  //     justifyContent: 'center',
+  //     zIndex: 9999,
+  //     position: 'fixed',
+  //     top: 0,
+  //     left: 0,
+  //   }}>
+  //     DEBUG: VideoIntro is mounted
+  //   </div>
+  // );
   return (
     <AppLayout>
       <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -126,6 +146,7 @@ function VideoIntro() {
         
         {/* Show loading state if video isn't ready */}
         {!isVideoReady && (
+          (() => { console.log('VideoIntro: loading overlay rendered'); return null; })() ||
           <div style={{
             position: 'absolute',
             top: 0,
