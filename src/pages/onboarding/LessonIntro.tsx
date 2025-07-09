@@ -1,7 +1,6 @@
 import AppLayout from '../../components/ScreenLayout';
 import Button from '../../components/Button';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 
 /**
  * LessonIntro page: Introduces lesson one (Treasure Tracker) with themed image and description.
