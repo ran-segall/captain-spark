@@ -60,8 +60,13 @@ function Intro() {
     const video = videoRef.current;
     if (!video) return;
     video.preload = 'auto';
-    video.muted = false;
+    video.muted = true; // Mute for preloading
     video.playsInline = true;
+    video.style.opacity = '0'; // Hide but keep in layout
+    video.style.pointerEvents = 'none';
+    video.style.position = 'absolute';
+    video.style.top = '-9999px';
+    video.style.left = '-9999px';
     const loadVideo = async () => {
       try {
         await video.load();
@@ -72,13 +77,26 @@ function Intro() {
         console.log('Video preload error:', error);
       }
     };
+    const handleCanPlayThrough = () => {
+      console.log('Intro: video element canplaythrough fired');
+    };
+    video.addEventListener('canplaythrough', handleCanPlayThrough);
     loadVideo();
+    return () => {
+      video.removeEventListener('canplaythrough', handleCanPlayThrough);
+    };
   }, []);
 
   // Play video when showVideo is set
   useEffect(() => {
     if (showVideo && videoRef.current && isVideoReady) {
       videoRef.current.currentTime = 0;
+      videoRef.current.muted = false; // Unmute for playback
+      videoRef.current.style.opacity = '1';
+      videoRef.current.style.position = '';
+      videoRef.current.style.top = '';
+      videoRef.current.style.left = '';
+      videoRef.current.style.pointerEvents = '';
       videoRef.current.play();
     }
   }, [showVideo, isVideoReady]);
@@ -190,7 +208,7 @@ function Intro() {
               ref={videoRef}
               src={VIDEO_PATHS.ONBOARDING.INTRO}
               preload="auto"
-              muted={false}
+              // muted is set dynamically
               playsInline
               style={{
                 width: '100%',
