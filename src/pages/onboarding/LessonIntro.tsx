@@ -1,7 +1,6 @@
 import AppLayout from '../../components/ScreenLayout';
 import Button from '../../components/Button';
 import { useNavigate } from 'react-router-dom';
-import ProgressBar from '../../components/ProgressBar';
 import { useState } from 'react';
 
 /**
@@ -10,7 +9,6 @@ import { useState } from 'react';
  */
 function LessonIntro() {
   const navigate = useNavigate();
-  const [progress] = useState(0);
 
   const handleGetStarted = () => {
     navigate('/onboarding/ready');
@@ -19,7 +17,6 @@ function LessonIntro() {
   return (
     <AppLayout>
       <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', zIndex: 1, background: 'white' }}>
-       
         <div
           style={{
             padding: '2rem',
