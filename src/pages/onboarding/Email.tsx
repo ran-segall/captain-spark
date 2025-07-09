@@ -103,6 +103,12 @@ const Email = () => {
           boxSizing: 'border-box',
           alignItems: 'center',
         }}
+        onKeyDown={e => {
+          if (e.key === 'Enter' && isValidEmail(email) && !isSubmitting) {
+            handleContinue();
+          }
+        }}
+        tabIndex={-1}
       >
         <div style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1 }}>
           <OnboardingProgressBar step={4} totalSteps={4} />
@@ -157,6 +163,7 @@ const Email = () => {
             disabled={!isValidEmail(email) || isSubmitting}
             variant={!isValidEmail(email) || isSubmitting ? 'disabled' : 'primary'}
             fullWidth
+            loading={isSubmitting}
           >
             {isSubmitting ? 'Creating Account...' : 'Continue'}
           </Button>

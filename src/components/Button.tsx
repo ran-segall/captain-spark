@@ -6,6 +6,7 @@ interface ButtonProps {
   variant?: 'primary' | 'secondary' | 'success' | 'disabled';
   fullWidth?: boolean;
   disabled?: boolean;
+  loading?: boolean;
 }
 
 const VARIANT_STYLES = {
@@ -31,15 +32,47 @@ const VARIANT_STYLES = {
   },
 };
 
+const Spinner: React.FC = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    style={{ marginRight: 10, verticalAlign: 'middle', display: 'inline-block' }}
+  >
+    <circle
+      cx="10"
+      cy="10"
+      r="8"
+      stroke="#222"
+      strokeWidth="3"
+      strokeDasharray="40 20"
+      strokeLinecap="round"
+      fill="none"
+    >
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0 10 10"
+        to="360 10 10"
+        dur="0.8s"
+        repeatCount="indefinite"
+      />
+    </circle>
+  </svg>
+);
+
 const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
   variant = 'primary',
   fullWidth = true,
   disabled = false,
+  loading = false,
 }) => {
   // If disabled prop is true or variant is 'disabled', treat as disabled
-  const isDisabled = disabled || variant === 'disabled';
+  const isDisabled = disabled || variant === 'disabled' || loading;
   const style = {
     ...{
       border: 'none',
@@ -65,7 +98,10 @@ const Button: React.FC<ButtonProps> = ({
       disabled={isDisabled}
       tabIndex={isDisabled ? -1 : 0}
     >
-      {children}
+      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', height: '100%', pointerEvents: 'none' }}>
+        {loading && <Spinner />}
+        <span>{children}</span>
+      </span>
     </button>
   );
 };

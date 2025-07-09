@@ -3,7 +3,7 @@
 export const VIDEO_PATHS = {
   // Onboarding videos (only include videos that actually exist)
   ONBOARDING: {
-    INTRO: '/videos/onboarding/Onboarding-1-HB.mp4',
+    INTRO: '/videos/onboarding/Onboarding-intro.mp4',
     PERSONAL_WELCOME: '/videos/onboarding/Onboarding-personal.mp4',
   },
 } as const;

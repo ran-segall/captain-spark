@@ -34,6 +34,12 @@ const KidAge = () => {
           boxSizing: 'border-box',
           alignItems: 'center',
         }}
+        onKeyDown={e => {
+          if (e.key === 'Enter' && isValidAge()) {
+            handleContinue();
+          }
+        }}
+        tabIndex={-1}
       >
         <div style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1 }}>
           <OnboardingProgressBar step={3} totalSteps={4} />

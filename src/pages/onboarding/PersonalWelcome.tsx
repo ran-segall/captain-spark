@@ -13,7 +13,6 @@ function PersonalWelcome() {
   const [isVideoReady, setIsVideoReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const welcomeAudioRef = useRef<HTMLAudioElement | null>(null);
-  const [hasCustomAudio, setHasCustomAudio] = useState(false);
 
   const welcomeAudioBlob = location.state?.welcomeAudioBlob;
 
@@ -38,7 +37,6 @@ function PersonalWelcome() {
 
     // If we have custom audio, play video muted and sync audio
     if (welcomeAudioUrl && audio) {
-      setHasCustomAudio(true);
       
       const handleVideoPlay = () => {
         if (audio) {
@@ -68,8 +66,6 @@ function PersonalWelcome() {
         video.removeEventListener('pause', handleVideoPause);
         video.removeEventListener('seeked', handleVideoSeek);
       };
-    } else {
-      setHasCustomAudio(false);
     }
   }, [welcomeAudioUrl]);
 

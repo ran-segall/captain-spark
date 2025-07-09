@@ -29,6 +29,12 @@ const KidName = () => {
           boxSizing: 'border-box',
           alignItems: 'center',
         }}
+        onKeyDown={e => {
+          if (e.key === 'Enter' && childName.trim()) {
+            handleContinue();
+          }
+        }}
+        tabIndex={-1}
       >
         <div style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1 }}>
           <OnboardingProgressBar step={2} totalSteps={4} />
