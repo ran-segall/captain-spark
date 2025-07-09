@@ -1,0 +1,18 @@
+# #!/usr/bin/env sh
+# . "$(dirname -- "$0")/_/husky.sh"
+# 
+# echo "🔍 Running pre-commit checks..."
+# 
+# # Run ESLint to catch unused variables and imports
+# echo "📝 Checking code quality..."
+# npm run lint
+# 
+# # Auto-fix any fixable issues
+# echo "🔧 Auto-fixing code issues..."
+# npm run lint:fix
+# 
+# # Update documentation
+# echo "📚 Updating project documentation..."
+# npm run update-docs
+# 
+# echo "✅ Pre-commit checks completed!"

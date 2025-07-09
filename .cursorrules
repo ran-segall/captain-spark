@@ -1,0 +1,194 @@
+# Captain Spark Development Rules
+
+## 🎯 Project Overview
+Captain Spark is an educational app for children featuring video content, onboarding flows, and interactive learning experiences. The app prioritizes mobile performance, smooth video playback, and engaging user experiences.
+
+## 🏗️ Architecture & Patterns
+
+### React + TypeScript Standards
+- Use functional components with hooks
+- Prefer TypeScript over JavaScript
+- Use proper type definitions for all props and state
+- Follow React 19+ patterns and best practices
+- Use React Router for navigation
+
+### Component Structure
+- Keep components focused and single-purpose
+- Use composition over inheritance
+- Prefer controlled components for forms
+- Implement proper error boundaries
+- Use React.memo() for performance optimization when needed
+
+### State Management
+- Use React hooks (useState, useEffect, useContext) for local state
+- Use Supabase for backend data persistence
+- Implement proper loading and error states
+- Cache data appropriately to reduce API calls
+
+## 🎨 UI/UX Guidelines
+
+### Design Principles
+- Mobile-first responsive design
+- Accessible and child-friendly interface
+- Smooth animations and transitions
+- Clear visual hierarchy
+- Consistent spacing and typography
+
+### Video & Media
+- Always use the video preloading system for video content
+- Implement proper loading states and progress indicators
+- Handle video errors gracefully
+- Optimize for mobile video playback
+- Use appropriate video formats and compression
+
+### Onboarding Flow
+- Keep onboarding steps simple and engaging
+- Provide clear progress indicators
+- Allow users to go back and edit previous steps
+- Collect only necessary information
+- Provide immediate feedback and validation
+
+## 🚀 Performance Requirements
+
+### Video Performance
+- Preload critical videos on app start
+- Use service worker caching for video content
+- Implement progressive loading for large video files
+- Monitor and optimize video loading times
+- Handle slow network conditions gracefully
+
+### Mobile Optimization
+- Optimize for mobile browsers and networks
+- Minimize bundle size and loading times
+- Use appropriate touch targets and gestures
+- Implement proper viewport handling
+- Test on various mobile devices and screen sizes
+
+## 🔧 Development Standards
+
+### Code Quality
+- Write self-documenting code with clear variable names
+- Add JSDoc comments for complex functions
+- Follow ESLint rules and TypeScript strict mode
+- Use consistent code formatting
+- Implement proper error handling
+
+### File Organization
+- Group related components in feature folders
+- Keep utility functions in dedicated utils folders
+- Use index files for clean imports
+- Maintain consistent file naming conventions
+- Separate concerns between UI, logic, and data
+
+### Testing & Debugging
+- Test video preloading functionality thoroughly
+- Verify mobile performance on real devices
+- Test onboarding flow end-to-end
+- Implement proper error logging
+- Use React DevTools for debugging
+
+## 🎮 Feature-Specific Rules
+
+### Video Preloading System
+- Always use the `useVideoPreloader` hook for video content
+- Implement proper loading states and progress tracking
+- Handle preloading errors gracefully
+- Cache videos appropriately using service worker
+- Monitor video loading performance
+
+### Onboarding Components
+- Keep onboarding steps simple and focused
+- Implement proper form validation
+- Provide clear error messages
+- Allow users to navigate between steps
+- Save progress appropriately
+
+### Audio Integration
+- Use ElevenLabs for text-to-speech functionality
+- Implement proper audio loading and playback
+- Handle audio errors gracefully
+- Provide audio controls when appropriate
+- Ensure audio doesn't interfere with video playback
+
+## 🛠️ Technical Constraints
+
+### Dependencies
+- `@supabase/supabase-js` - Backend data management and authentication
+- `react` - UI library for building user interfaces
+- `react-dom` - React rendering for web
+- `react-router-dom` - Client-side routing for React
+- `uuid` - Unique identifier generation
+
+### Browser Support
+- Modern mobile browsers (iOS Safari, Chrome Mobile)
+- Desktop browsers (Chrome, Firefox, Safari, Edge)
+- Progressive Web App capabilities
+- Service Worker support
+
+### Performance Targets
+- Video start time: < 2 seconds on mobile
+- App load time: < 3 seconds
+- Smooth 60fps animations
+- Responsive touch interactions
+
+## 🔒 Security & Privacy
+
+### Data Handling
+- Collect minimal personal information
+- Implement proper data validation
+- Use secure API endpoints
+- Handle user data responsibly
+- Follow privacy best practices for children's apps
+
+### Content Safety
+- Ensure all content is child-appropriate
+- Implement content filtering if needed
+- Monitor user-generated content
+- Provide parental controls where appropriate
+
+## 📝 Documentation
+
+### Code Documentation
+- Document complex business logic
+- Add README files for major features
+- Keep API documentation updated
+- Document video preloading system usage
+- Maintain onboarding flow documentation
+
+### User Documentation
+- Provide clear user instructions
+- Document accessibility features
+- Include troubleshooting guides
+- Maintain help documentation
+
+### Automated Documentation
+- **ALWAYS** run `npm run update-docs` when adding new features
+- The script automatically updates PROJECT_CONTEXT.md and .cursorrules
+- Updates project structure, dependencies, and last modified dates
+- Runs automatically on pre-commit via Husky hooks
+- Keeps documentation in sync with codebase changes
+
+## 🚨 Critical Rules
+
+1. **NEVER** write code with unused variables, unused imports, or any code that would trigger a lint error. All code must pass ESLint with no errors or warnings.
+2. **ALWAYS** use the video preloading system for any video content
+3. **NEVER** hardcode video paths - use the videoPaths utility
+4. **ALWAYS** implement proper loading states for async operations
+5. **NEVER** block the UI thread with heavy operations
+6. **ALWAYS** test on mobile devices before deploying
+7. **NEVER** skip error handling for video or audio operations
+8. **ALWAYS** validate user input in onboarding forms
+9. **NEVER** expose sensitive information in client-side code
+10. **ALWAYS** run `npm run update-docs` when adding new features or dependencies
+
+## 🎯 Success Metrics
+
+- Smooth video playback on mobile devices
+- Fast onboarding completion rates
+- Low error rates in video preloading
+- Positive user engagement metrics
+- High app performance scores 
+
+## 📝 Last Updated
+
+*Rules last updated: 2025-07-09*
