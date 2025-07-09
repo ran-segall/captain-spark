@@ -112,31 +112,39 @@ function Intro() {
               flex: 1,
               textAlign: 'center',
               zIndex: 1,
+              minHeight: 0,
             }}
           >
-            <h1 style={{ fontSize: '2.4rem', fontWeight: 900, letterSpacing: '-0.06rem', color: '#1f2d3d' }}>
-              Captain Spark
-            </h1>
-            <img
-              src="/images/onboarding/captain-intro.jpg"
-              alt="Captain Spark"
-              style={{
-                maxWidth: '80%',
-                maxHeight: '40vh',
-                objectFit: 'contain',
-                margin: '0',
-              }}
-            />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1f2d3d', margin: '0 0' }}>
-              Where Smart Kids Level Up
-            </h2>
-            <p style={{ maxWidth: 300, fontSize: '1rem', color: '#555', margin: '0.5rem 0rem 2rem 0px' }}>
-              Fun learning adventures in life skills, money smarts, and confident thinking.
-            </p>
-            <div style={{ marginTop: 'auto', width: '100%' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+              <h1>
+                Captain Spark
+              </h1>
+              <div style={{ flexShrink: 1, minHeight: 0, maxHeight: '40%', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <img
+                  src="/images/onboarding/captain-intro.jpg"
+                  alt="Captain Spark"
+                  style={{
+                    maxWidth: '80%',
+                    maxHeight: '100%',
+                    objectFit: 'contain',
+                    height: 'auto',
+                    width: 'auto',
+                    minHeight: 0,
+                  }}
+                />
+              </div>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1f2d3d', margin: '0 0' }}>
+                Where Smart Kids Level Up
+              </h2>
+              <p style={{ maxWidth: 300, fontSize: '1rem', color: '#555', margin: '0.5rem 0rem 2rem 0px' }}>
+                Fun learning adventures in life skills, money smarts, and confident thinking.
+              </p>
+            </div>
+            <div style={{ marginTop: 'auto', width: '100%', flexShrink: 0 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <Button variant="primary" onClick={handleGetStarted}>Get Started</Button>
                 <Button variant="secondary">Log In</Button>
+                <Button variant="secondary" onClick={() => navigate('/onboarding/lesson-intro')}>Dev: Lesson Intro</Button>
               </div>
             </div>
           </div>

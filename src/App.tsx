@@ -8,6 +8,7 @@ import Email from './pages/onboarding/Email';
 import PersonalWelcome from './pages/onboarding/PersonalWelcome';
 import Ready from './pages/onboarding/Ready';
 import Confirm from './pages/onboarding/Confirm';
+import LessonIntro from './pages/onboarding/LessonIntro';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/onboarding/personal-welcome" element={<PersonalWelcome />} />
         <Route path="/onboarding/ready" element={<Ready />} />
         <Route path="/onboarding/confirm" element={<Confirm />} />
+        <Route path="/onboarding/lesson-intro" element={<LessonIntro />} />
       </Routes>
     </Router>
   );

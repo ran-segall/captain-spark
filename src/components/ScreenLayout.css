@@ -1,58 +1,58 @@
-.page-wrapper {
-  background-color: #f3f3f3;
-  width: 100vw;
-  min-height: 100dvh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem 2rem 4rem 2rem;
-  box-sizing: border-box;
-  position: relative;
-  z-index: 1;
-}
-
-.app-wrapper {
-  background-color: white;
-  border-radius: 1rem;
-  width: 100%;
-  max-width: 420px;
-  /* Maintain mobile aspect ratio and height on desktop */
-  aspect-ratio: 9 / 19.5;
-  max-height: 650px;
-  min-height: 600px;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 0 10px rgba(0,0,0,0.04);
-  overflow: hidden;
-  position: relative;
-  z-index: 1;
-}
-
-.app-wrapper video {
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  border-radius: inherit;
-  display: block;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* Mobile styles */
-@media (max-width: 768px) {
+@layer components {
   .page-wrapper {
-    padding: 0;
-  }
-  
-  .app-wrapper {
-    border-radius: 0;
-    height: 100dvh;
-    aspect-ratio: auto;
-    max-height: none;
+    background-color: #f3f3f3;
+    width: 100vw;
     min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 2rem 4rem 2rem;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+  }
+
+  .app-wrapper {
+    background-color: white;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 420px;
+    min-height: 600px;
+    height: 650px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 10px rgba(0,0,0,0.04);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+
+  .app-wrapper video {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    border-radius: inherit;
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Mobile styles */
+  @media (max-width: 768px) {
+    .page-wrapper {
+      padding: 0;
+    }
+    
+    .app-wrapper {
+      border-radius: 0;
+      height: 100dvh;
+      aspect-ratio: auto;
+      max-height: none;
+      min-height: 100dvh;
+    }
   }
 } 

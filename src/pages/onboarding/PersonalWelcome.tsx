@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/ScreenLayout';
 import VideoPlayer from '../../components/VideoPlayer';
 import ProgressBar from '../../components/ProgressBar';
@@ -9,6 +9,7 @@ import { VIDEO_PATHS } from '../../utils/videoPaths';
 
 function PersonalWelcome() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [progress, setProgress] = useState(0);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -82,7 +83,7 @@ function PersonalWelcome() {
   };
 
   const handleVideoEnd = () => {
-    // Do nothing for now
+    navigate('/onboarding/lesson-intro');
   };
 
   useEffect(() => {
