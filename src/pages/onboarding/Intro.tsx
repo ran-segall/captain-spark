@@ -1,13 +1,11 @@
 import AppLayout from '../../components/ScreenLayout';
 import Button from '../../components/Button';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
-import videoPreloader from '../../utils/videoPreloader';
+import { useRef, useState } from 'react';
 import { VIDEO_PATHS } from '../../utils/videoPaths';
 import ProgressBar from '../../components/ProgressBar';
 import BackIcon from '../../assets/icons/back-icon-video.svg';
 
-// Spinner SVG reused from Button.tsx
 const Spinner = () => (
   <svg
     width="32"
@@ -46,63 +44,17 @@ function Intro() {
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  // Preload video on mount
-  useEffect(() => {
-    const videoSrc = VIDEO_PATHS.ONBOARDING.INTRO;
-    videoPreloader.preloadVideo(videoSrc)
-      .then(() => {
-        console.log('Intro: video preloader utility finished');
-      })
-      .catch(error => {
-        console.warn('Video preload failed:', error);
-      });
-
-    const video = videoRef.current;
-    if (!video) return;
-    video.preload = 'auto';
-    video.muted = true; // Mute for preloading
-    video.playsInline = true;
-    video.style.opacity = '0'; // Hide but keep in layout
-    video.style.pointerEvents = 'none';
-    video.style.position = 'absolute';
-    video.style.top = '-9999px';
-    video.style.left = '-9999px';
-    const loadVideo = async () => {
-      try {
-        await video.load();
-        video.currentTime = 0.1;
-        video.currentTime = 0;
-        console.log('Intro: video element load finished');
-      } catch (error) {
-        console.log('Video preload error:', error);
-      }
-    };
-    const handleCanPlayThrough = () => {
-      console.log('Intro: video element canplaythrough fired');
-    };
-    video.addEventListener('canplaythrough', handleCanPlayThrough);
-    loadVideo();
-    return () => {
-      video.removeEventListener('canplaythrough', handleCanPlayThrough);
-    };
-  }, []);
-
-  // Play video when showVideo is set
-  useEffect(() => {
-    if (showVideo && videoRef.current && isVideoReady) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.muted = false; // Unmute for playback
-      videoRef.current.style.opacity = '1';
-      videoRef.current.style.position = '';
-      videoRef.current.style.top = '';
-      videoRef.current.style.left = '';
-      videoRef.current.style.pointerEvents = '';
-      videoRef.current.play();
-    }
-  }, [showVideo, isVideoReady]);
+  // Play video muted in the background on mount
+  // No need for preloading logic, just let it play
 
   const handleGetStarted = () => {
     setShowVideo(true);
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.muted = false;
+      videoRef.current.play();
+      videoRef.current.style.zIndex = '1';
+    }
   };
 
   const handleVideoReady = () => {
@@ -110,28 +62,56 @@ function Intro() {
   };
 
   const handleVideoEnd = () => {
-    navigate('/onboarding/parent-name');
+    if (showVideo) {
+      navigate('/onboarding/parent-name');
+    }
   };
 
   const handleProgress = (currentTime: number, duration: number) => {
     setProgress(duration > 0 ? currentTime / duration : 0);
   };
 
-  // Layout
   return (
     <AppLayout>
-      <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* Main content overlays, always above video */}
+      <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', zIndex: 1, background: 'white' }}>
+        {/* Video element always present, muted and playing in the background */}
+        <video
+          ref={videoRef}
+          src={VIDEO_PATHS.ONBOARDING.INTRO}
+          preload="auto"
+          muted
+          autoPlay
+          playsInline
+          style={{
+            position: 'absolute',
+            zIndex: 0,
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            background: '#000',
+            pointerEvents: 'none',
+            transition: 'z-index 0.2s, position 0.2s',
+          }}
+          onCanPlay={handleVideoReady}
+          onEnded={handleVideoEnd}
+          onTimeUpdate={e => handleProgress(e.currentTarget.currentTime, e.currentTarget.duration)}
+        />
         {/* Intro content */}
         {!showVideo && (
           <div
             style={{
               padding: '2rem',
               display: 'flex',
+              backgroundColor: 'white',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               flex: 1,
               textAlign: 'center',
+              zIndex: 1,
             }}
           >
             <h1 style={{ fontSize: '2.4rem', fontWeight: 900, letterSpacing: '-0.06rem', color: '#1f2d3d' }}>
@@ -161,14 +141,54 @@ function Intro() {
             </div>
           </div>
         )}
-        {/* Video content */}
+        {/* Video content overlays */}
         {showVideo && (
-          <div style={{ width: '100%', height: '100%', position: 'relative', flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', zIndex: 2 }}>
-              <div style={{ margin: '2rem' }}>
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'relative',
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              zIndex: 1,
+            }}
+          >
+            {/* Clickable overlay for rewind functionality (z-index: 2) */}
+            <div
+              onClick={e => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const clickPercentage = (clickX / rect.width) * 100;
+                if (clickPercentage <= 30 && videoRef.current) {
+                  videoRef.current.currentTime = 0;
+                  videoRef.current.play();
+                }
+              }}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: 2,
+                cursor: 'pointer',
+                background: 'transparent',
+                pointerEvents: 'auto',
+              }}
+            />
+            {/* Overlays always above video and clickable area (z-index: 3) */}
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', zIndex: 3, pointerEvents: 'auto' }}>
+              <div style={{ margin: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <ProgressBar progress={progress} />
                 <button
-                  onClick={() => setShowVideo(false)}
+                  onClick={() => {
+                    setShowVideo(false);
+                    if (videoRef.current) {
+                      videoRef.current.style.zIndex = '0';
+                      videoRef.current.pause();
+                    }
+                  }}
                   style={{
                     background: 'none',
                     border: 'none',
@@ -204,27 +224,6 @@ function Intro() {
                 <div style={{ color: '#fff', fontSize: '1.2rem', marginTop: 16 }}>Loading</div>
               </div>
             )}
-            <video
-              ref={videoRef}
-              src={VIDEO_PATHS.ONBOARDING.INTRO}
-              preload="auto"
-              // muted is set dynamically
-              playsInline
-              style={{
-                width: '100%',
-                height: '100%',
-                padding: 0,
-                margin: 0,
-                display: 'block',
-                border: 'none',
-                outline: 'none',
-                objectFit: 'fill',
-                background: '#000',
-              }}
-              onCanPlay={handleVideoReady}
-              onEnded={handleVideoEnd}
-              onTimeUpdate={e => handleProgress(e.currentTarget.currentTime, e.currentTarget.duration)}
-            />
           </div>
         )}
       </div>
