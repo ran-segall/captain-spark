@@ -95,7 +95,7 @@ function Intro() {
         ref={videoRef}
         src={VIDEO_PATHS.ONBOARDING.INTRO}
         preload="auto"
-        muted={false}
+        muted
         playsInline
         style={{ 
           display: 'none',

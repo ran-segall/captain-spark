@@ -7,6 +7,38 @@ import BackIcon from '../../assets/icons/back-icon-video.svg';
 import videoPreloader from '../../utils/videoPreloader';
 import { VIDEO_PATHS } from '../../utils/videoPaths';
 
+// Spinner SVG reused from Button.tsx
+const Spinner = () => (
+  <svg
+    width="32"
+    height="32"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    style={{ marginRight: 0, verticalAlign: 'middle', display: 'inline-block' }}
+  >
+    <circle
+      cx="10"
+      cy="10"
+      r="8"
+      stroke="#222"
+      strokeWidth="3"
+      strokeDasharray="40 20"
+      strokeLinecap="round"
+      fill="none"
+    >
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0 10 10"
+        to="360 10 10"
+        dur="0.8s"
+        repeatCount="indefinite"
+      />
+    </circle>
+  </svg>
+);
+
 function VideoIntro() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -102,11 +134,13 @@ function VideoIntro() {
             height: '100%',
             backgroundColor: '#000',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 1
           }}>
-            <div style={{ color: '#fff', fontSize: '1.2rem' }}>Loading...</div>
+            <Spinner />
+            <div style={{ color: '#fff', fontSize: '1.2rem', marginTop: 16 }}>Loading</div>
           </div>
         )}
         
