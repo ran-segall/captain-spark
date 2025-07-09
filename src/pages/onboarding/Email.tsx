@@ -7,7 +7,7 @@ import BackIcon from '../../assets/icons/back-icon-blue.svg';
 import { supabase } from '../../utils/supabaseClient';
 import videoPreloader from '../../utils/videoPreloader';
 import { VIDEO_PATHS } from '../../utils/videoPaths';
-import { generateAudioForName } from '../../utils/elevenlabsClient';
+import { generateWelcomeAudio } from '../../utils/elevenlabsClient';
 
 const Email = () => {
   const [email, setEmail] = useState('');
@@ -16,7 +16,7 @@ const Email = () => {
 
   // Start preloading the next video when component mounts
   useEffect(() => {
-    const nextVideoPath = VIDEO_PATHS.ONBOARDING.WELCOME_NO_NAMES;
+    const nextVideoPath = VIDEO_PATHS.ONBOARDING.PERSONAL_WELCOME;
     videoPreloader.preloadVideo(nextVideoPath).catch(error => {
       console.warn('Failed to preload video:', error);
     });
@@ -39,34 +39,10 @@ const Email = () => {
         throw new Error('Missing onboarding data.');
       }
 
-      // 1. Generate audio for parent and kid names
-      const [parentAudioBlob, kidAudioBlob] = await Promise.all([
-        generateAudioForName(`${parentName}`),
-        generateAudioForName(`${childName}`),
-      ]);
+      // 1. Start ElevenLabs audio generation with timeout
+      const audioPromise = generateWelcomeAudio(parentName, childName, 10000);
 
-      // 2. Upload both blobs to Supabase Storage
-      // Generate unique filenames
-      const parentAudioFilename = `parent-audio-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
-      const kidAudioFilename = `kid-audio-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
-
-      // Upload parent audio
-      const { error: parentAudioError } = await supabase.storage
-        .from('audio')
-        .upload(parentAudioFilename, parentAudioBlob, { contentType: 'audio/mpeg' });
-      if (parentAudioError) throw parentAudioError;
-
-      // Upload kid audio
-      const { error: kidAudioError } = await supabase.storage
-        .from('audio')
-        .upload(kidAudioFilename, kidAudioBlob, { contentType: 'audio/mpeg' });
-      if (kidAudioError) throw kidAudioError;
-
-      // 3. Get public URLs
-      const parentAudioUrl = supabase.storage.from('audio').getPublicUrl(parentAudioFilename).data.publicUrl;
-      const kidAudioUrl = supabase.storage.from('audio').getPublicUrl(kidAudioFilename).data.publicUrl;
-
-      // 4. Insert user row in Supabase
+      // 2. Insert user row in Supabase (don't wait for audio)
       const { data: _data, error } = await supabase
         .from('users')
         .insert([
@@ -75,28 +51,35 @@ const Email = () => {
             kid_name: childName,
             kid_age: parseInt(childAge || '0'),
             email: email,
-            parent_audio_url: parentAudioUrl,
-            kid_audio_url: kidAudioUrl,
             created_at: new Date().toISOString(),
           },
         ])
         .select();
+      
       if (error) {
         console.error('Error inserting user:', error);
         return;
       }
 
-      // 5. Clear localStorage after successful submission
+      // 3. Wait for audio generation (with timeout already handled)
+      let welcomeAudioBlob: Blob | null = null;
+      try {
+        welcomeAudioBlob = await audioPromise;
+      } catch (error) {
+        console.log('ElevenLabs failed, continuing without audio');
+        welcomeAudioBlob = null;
+      }
+
+      // 4. Clear localStorage after successful submission
       localStorage.removeItem('parentName');
       localStorage.removeItem('childName');
       localStorage.removeItem('childAge');
 
-      // 6. Navigate to personal welcome page with interacted state and pass blobs
+      // 5. Navigate to personal welcome page
       navigate('/onboarding/personal-welcome', {
         state: {
           interacted: true,
-          parentAudioBlob,
-          kidAudioBlob,
+          welcomeAudioBlob,
         },
       });
     } catch (error) {

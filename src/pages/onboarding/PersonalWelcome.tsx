@@ -12,84 +12,66 @@ function PersonalWelcome() {
   const [progress, setProgress] = useState(0);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const parentAudioRef = useRef<HTMLAudioElement | null>(null);
-  const kidAudioRef = useRef<HTMLAudioElement | null>(null);
-  const [parentPlayed, setParentPlayed] = useState(false);
-  const [kidPlayed, setKidPlayed] = useState(false);
-  const [parentPlaying, setParentPlaying] = useState(false);
-  const [kidPlaying, setKidPlaying] = useState(false);
+  const welcomeAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [hasCustomAudio, setHasCustomAudio] = useState(false);
 
-  const parentAudioBlob = location.state?.parentAudioBlob;
-  const kidAudioBlob = location.state?.kidAudioBlob;
+  const welcomeAudioBlob = location.state?.welcomeAudioBlob;
 
-  // Use useMemo to create object URLs only when blobs change
-  const parentAudioUrl = useMemo(
-    () => (parentAudioBlob ? URL.createObjectURL(parentAudioBlob) : null),
-    [parentAudioBlob]
-  );
-  const kidAudioUrl = useMemo(
-    () => (kidAudioBlob ? URL.createObjectURL(kidAudioBlob) : null),
-    [kidAudioBlob]
+  // Use useMemo to create object URL only when blob changes
+  const welcomeAudioUrl = useMemo(
+    () => (welcomeAudioBlob ? URL.createObjectURL(welcomeAudioBlob) : null),
+    [welcomeAudioBlob]
   );
 
-  // Clean up object URLs on unmount or when blob changes
+  // Clean up object URL on unmount or when blob changes
   useEffect(() => {
     return () => {
-      if (parentAudioUrl) URL.revokeObjectURL(parentAudioUrl);
-      if (kidAudioUrl) URL.revokeObjectURL(kidAudioUrl);
+      if (welcomeAudioUrl) URL.revokeObjectURL(welcomeAudioUrl);
     };
-  }, [parentAudioUrl, kidAudioUrl]);
+  }, [welcomeAudioUrl]);
 
   useEffect(() => {
     const video = videoRef.current;
+    const audio = welcomeAudioRef.current;
+    
     if (!video) return;
 
-    const handleTimeUpdate = () => {
-      const currentTime = video.currentTime;
-      if (!parentPlayed && !parentPlaying && parentAudioRef.current && currentTime >= 0.6) {
-        parentAudioRef.current.currentTime = 0;
-        setParentPlaying(true);
-        parentAudioRef.current.play()
-          .catch(e => console.error('Parent audio play error:', e));
-        setParentPlayed(true);
-      }
-      if (!kidPlayed && !kidPlaying && kidAudioRef.current && currentTime >= 2.4) {
-        kidAudioRef.current.currentTime = 0;
-        setKidPlaying(true);
-        kidAudioRef.current.play()
-          .catch(e => console.error('Kid audio play error:', e));
-        setKidPlayed(true);
-      }
-    };
+    // If we have custom audio, play video muted and sync audio
+    if (welcomeAudioUrl && audio) {
+      setHasCustomAudio(true);
+      
+      const handleVideoPlay = () => {
+        if (audio) {
+          audio.currentTime = 0;
+          audio.play().catch(e => console.error('Welcome audio play error:', e));
+        }
+      };
 
-    const handleParentEnded = () => setParentPlaying(false);
-    const handleKidEnded = () => setKidPlaying(false);
+      const handleVideoPause = () => {
+        if (audio) {
+          audio.pause();
+        }
+      };
 
-    if (parentAudioRef.current) {
-      parentAudioRef.current.addEventListener('ended', handleParentEnded);
+      const handleVideoSeek = () => {
+        if (audio && !audio.paused) {
+          audio.currentTime = video.currentTime;
+        }
+      };
+
+      video.addEventListener('play', handleVideoPlay);
+      video.addEventListener('pause', handleVideoPause);
+      video.addEventListener('seeked', handleVideoSeek);
+
+      return () => {
+        video.removeEventListener('play', handleVideoPlay);
+        video.removeEventListener('pause', handleVideoPause);
+        video.removeEventListener('seeked', handleVideoSeek);
+      };
+    } else {
+      setHasCustomAudio(false);
     }
-    if (kidAudioRef.current) {
-      kidAudioRef.current.addEventListener('ended', handleKidEnded);
-    }
-
-    video.addEventListener('timeupdate', handleTimeUpdate);
-    video.addEventListener('play', () => {
-      setParentPlayed(false);
-      setKidPlayed(false);
-      setParentPlaying(false);
-      setKidPlaying(false);
-    });
-
-    return () => {
-      video.removeEventListener('timeupdate', handleTimeUpdate);
-      if (parentAudioRef.current) {
-        parentAudioRef.current.removeEventListener('ended', handleParentEnded);
-      }
-      if (kidAudioRef.current) {
-        kidAudioRef.current.removeEventListener('ended', handleKidEnded);
-      }
-    };
-  }, [parentAudioUrl, kidAudioUrl, parentPlayed, kidPlayed, parentPlaying, kidPlaying]);
+  }, [welcomeAudioUrl]);
 
   const handleProgress = (currentTime: number, duration: number) => {
     console.log(`Video progress: ${currentTime.toFixed(2)}s / ${duration.toFixed(2)}s`);
@@ -108,7 +90,7 @@ function PersonalWelcome() {
   };
 
   useEffect(() => {
-    const videoSrc = VIDEO_PATHS.ONBOARDING.WELCOME_NO_NAMES;
+    const videoSrc = VIDEO_PATHS.ONBOARDING.PERSONAL_WELCOME;
     
     // Check if video is already preloaded
     if (videoPreloader.isVideoReady(videoSrc)) {
@@ -117,6 +99,10 @@ function PersonalWelcome() {
         setTimeout(() => {
           const videoElement = document.querySelector('video');
           if (videoElement) {
+            // Set muted if we have custom audio
+            if (welcomeAudioUrl) {
+              videoElement.muted = true;
+            }
             videoElement.play();
           }
         }, 50); // Reduced delay for faster start
@@ -128,6 +114,10 @@ function PersonalWelcome() {
         const handleCanPlay = () => {
           setIsVideoReady(true);
           if (location.state?.interacted) {
+            // Set muted if we have custom audio
+            if (welcomeAudioUrl) {
+              video.muted = true;
+            }
             video.play();
           }
         };
@@ -142,7 +132,7 @@ function PersonalWelcome() {
         };
       }
     }
-  }, [location.state?.interacted]);
+  }, [location.state?.interacted, welcomeAudioUrl]);
 
   return (
     <AppLayout>
@@ -152,14 +142,12 @@ function PersonalWelcome() {
             <ProgressBar progress={progress} />
             <button
               onClick={() => {
-                // Reset played state and restart video
-                setParentPlayed(false);
-                setKidPlayed(false);
-                setParentPlaying(false);
-                setKidPlaying(false);
                 if (videoRef.current) {
                   videoRef.current.currentTime = 0;
                   videoRef.current.play();
+                }
+                if (welcomeAudioRef.current) {
+                  welcomeAudioRef.current.currentTime = 0;
                 }
               }}
               style={{
@@ -200,17 +188,14 @@ function PersonalWelcome() {
         <div style={{ flex: 1, minHeight: 0 }}>
           <VideoPlayer
             ref={videoRef}
-            src={VIDEO_PATHS.ONBOARDING.WELCOME_NO_NAMES}
+            src={VIDEO_PATHS.ONBOARDING.PERSONAL_WELCOME}
             onProgress={handleProgress}
             onProgressUpdate={handleProgressUpdate}
             onReady={handleVideoReady}
             onFinished={handleVideoEnd}
           />
-          {parentAudioUrl && (
-            <audio ref={parentAudioRef} src={parentAudioUrl} preload="auto" />
-          )}
-          {kidAudioUrl && (
-            <audio ref={kidAudioRef} src={kidAudioUrl} preload="auto" />
+          {welcomeAudioUrl && (
+            <audio ref={welcomeAudioRef} src={welcomeAudioUrl} preload="auto" />
           )}
         </div>
       </div>
