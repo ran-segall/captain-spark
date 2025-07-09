@@ -140,7 +140,7 @@ function VideoIntro() {
             zIndex: 1
           }}>
             <Spinner />
-            <div style={{ color: '#fff', fontSize: '1.2rem', marginTop: 16 }}>Loading</div>
+            <div style={{ color: '#111', fontSize: '1.2rem', marginTop: 16 }}>Loading</div>
           </div>
         )}
         
