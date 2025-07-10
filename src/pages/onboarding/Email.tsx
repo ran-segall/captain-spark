@@ -39,11 +39,28 @@ const Email = () => {
         throw new Error('Missing onboarding data.');
       }
 
-      // 1. Start ElevenLabs audio generation with timeout
+      // 1. Send magic link for passwordless sign-up/login
+      const { data: otpData, error: otpError } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/lesson/intro`,
+        },
+      });
+      if (otpError) {
+        if (otpError.message.includes('already registered')) {
+          alert('This email is already registered. Please use a different email or log in via the magic link.');
+        } else {
+          alert('Error sending magic link: ' + otpError.message);
+        }
+        setIsSubmitting(false);
+        return;
+      }
+
+      // 2. Start ElevenLabs audio generation with timeout
       const audioPromise = generateWelcomeAudio(parentName, childName, 10000);
 
-      // 2. Insert user row in Supabase (don't wait for audio)
-      const { data: _data, error } = await supabase
+      // 3. Insert user row in Supabase (don't wait for audio)
+      const { data: _data, error: insertError } = await supabase
         .from('users')
         .insert([
           {
@@ -56,12 +73,14 @@ const Email = () => {
         ])
         .select();
       
-      if (error) {
-        console.error('Error inserting user:', error);
+      if (insertError) {
+        console.error('Error inserting user:', insertError);
+        alert('Error saving user data. Please try again.');
+        setIsSubmitting(false);
         return;
       }
 
-      // 3. Wait for audio generation (with timeout already handled)
+      // 4. Wait for audio generation (with timeout already handled)
       let welcomeAudioBlob: Blob | null = null;
       try {
         welcomeAudioBlob = await audioPromise;
@@ -70,12 +89,12 @@ const Email = () => {
         welcomeAudioBlob = null;
       }
 
-      // 4. Clear localStorage after successful submission
+      // 5. Clear localStorage after successful submission
       localStorage.removeItem('parentName');
       localStorage.removeItem('childAge');
       // Do NOT remove childName here, so it is available for ReadyToStart and later steps
 
-      // 5. Navigate to personal welcome page
+      // 6. Navigate to personal welcome page
       navigate('/onboarding/personal-welcome', {
         state: {
           interacted: true,
@@ -84,6 +103,7 @@ const Email = () => {
       });
     } catch (error) {
       console.error('Error submitting form:', error);
+      alert('An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

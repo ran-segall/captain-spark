@@ -15,7 +15,7 @@ const ReadyToStart = () => {
   childName = childName ? capitalizeName(childName) : 'your child';
 
   const handleStartNow = () => {
-    navigate('/onboarding/lesson-intro');
+    navigate('/lesson/intro');
   };
 
   const handleStartLater = () => {

@@ -6,7 +6,7 @@ const StartLater = () => {
   const navigate = useNavigate();
 
   const handleStartNow = () => {
-    navigate('/onboarding/lesson-intro');
+    navigate('/lesson/intro');
   };
 
   return (

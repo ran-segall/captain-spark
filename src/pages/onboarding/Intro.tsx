@@ -145,7 +145,6 @@ function Intro() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <Button variant="primary" onClick={handleGetStarted}>Get Started</Button>
                 <Button variant="secondary">Log In</Button>
-                <Button variant="secondary" onClick={() => navigate('/onboarding/lesson-intro')}>Dev: Lesson Intro</Button>
               </div>
             </div>
           </div>
