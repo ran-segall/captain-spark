@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/ScreenLayout';
-import VideoPlayer from '../../components/VideoPlayer';
 import ProgressBar from '../../components/ProgressBar';
 import BackIcon from '../../assets/icons/back-icon-video.svg';
 import videoPreloader from '../../utils/videoPreloader';
@@ -71,11 +70,7 @@ function PersonalWelcome() {
   }, [welcomeAudioUrl]);
 
   const handleProgress = (currentTime: number, duration: number) => {
-    console.log(`Video progress: ${currentTime.toFixed(2)}s / ${duration.toFixed(2)}s`);
-  };
-
-  const handleProgressUpdate = (progressValue: number) => {
-    setProgress(progressValue);
+    setProgress(duration > 0 ? currentTime / duration : 0);
   };
 
   const handleVideoReady = () => {
@@ -83,7 +78,7 @@ function PersonalWelcome() {
   };
 
   const handleVideoEnd = () => {
-    navigate('/onboarding/lesson-intro');
+    navigate('/onboarding/ready-to-start');
   };
 
   useEffect(() => {
@@ -182,19 +177,31 @@ function PersonalWelcome() {
           </div>
         )}
         
-        <div style={{ flex: 1, minHeight: 0 }}>
-          <VideoPlayer
-            ref={videoRef}
-            src={VIDEO_PATHS.ONBOARDING.PERSONAL_WELCOME}
-            onProgress={handleProgress}
-            onProgressUpdate={handleProgressUpdate}
-            onReady={handleVideoReady}
-            onFinished={handleVideoEnd}
-          />
-          {welcomeAudioUrl && (
-            <audio ref={welcomeAudioRef} src={welcomeAudioUrl} preload="auto" />
-          )}
-        </div>
+        {/* Video element positioned like in Intro.tsx */}
+        <video
+          ref={videoRef}
+          src={VIDEO_PATHS.ONBOARDING.PERSONAL_WELCOME}
+          preload="auto"
+          muted={welcomeAudioUrl ? true : false}
+          playsInline
+          style={{
+            position: 'absolute',
+            zIndex: 1,
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            background: '#000',
+            pointerEvents: 'none',
+          }}
+          onCanPlay={handleVideoReady}
+          onEnded={handleVideoEnd}
+          onTimeUpdate={e => handleProgress(e.currentTarget.currentTime, e.currentTarget.duration)}
+        />
+        {welcomeAudioUrl && (
+          <audio ref={welcomeAudioRef} src={welcomeAudioUrl} preload="auto" />
+        )}
       </div>
     </AppLayout>
   );

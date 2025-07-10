@@ -119,7 +119,7 @@ function Intro() {
               <h1>
                 Captain Spark
               </h1>
-              <div style={{ flexShrink: 1, minHeight: 0, maxHeight: '40%', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div style={{ flex: 1, minHeight: 0, maxHeight: '60%', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <img
                   src="/images/onboarding/captain-intro.jpg"
                   alt="Captain Spark"
@@ -130,6 +130,7 @@ function Intro() {
                     height: 'auto',
                     width: 'auto',
                     minHeight: 0,
+                    paddingBottom: '1rem',
                   }}
                 />
               </div>

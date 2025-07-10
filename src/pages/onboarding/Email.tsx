@@ -72,8 +72,8 @@ const Email = () => {
 
       // 4. Clear localStorage after successful submission
       localStorage.removeItem('parentName');
-      localStorage.removeItem('childName');
       localStorage.removeItem('childAge');
+      // Do NOT remove childName here, so it is available for ReadyToStart and later steps
 
       // 5. Navigate to personal welcome page
       navigate('/onboarding/personal-welcome', {

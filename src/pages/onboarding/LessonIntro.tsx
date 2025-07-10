@@ -39,7 +39,7 @@ function LessonIntro() {
             <h1>
               Captain Spark’s<br />Treasure Tracker
             </h1>
-            <div style={{ flexShrink: 1, minHeight: 0, maxHeight: '40%', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ flex: 1, minHeight: 0, maxHeight: '60%', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <img
                 src="/images/onboarding/Start-Course-1.jpg"
                 alt="Captain Spark and robot with coins"
