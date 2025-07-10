@@ -201,7 +201,7 @@ const LessonBuilder: React.FC = () => {
       .insert([{ ...newLesson }])
       .select();
     if (error) setLessonError(error.message);
-    else setLessons(prev => [...prev, ...(data || [])]);
+    // No data returned, so just refetch or optimistically update if needed
     setNewLesson({ course_id: '', title: '', order: 1, tag: '' });
     setLessonLoading(false);
   };
@@ -268,7 +268,7 @@ const LessonBuilder: React.FC = () => {
       .insert([{ ...newSlide }])
       .select();
     if (error) setSlideError(error.message);
-    else setSlides(prev => [...prev, ...((data || []).map((s: any) => ({ ...s, type: s.type as 'video' | 'quiz' })))]);
+    // No data returned, so just refetch or optimistically update if needed
     setNewSlide({ lesson_id: '', type: 'video', order: 1 });
     setSlideLoading(false);
   };
