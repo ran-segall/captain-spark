@@ -40,7 +40,7 @@ const Email = () => {
       }
 
       // 1. Send magic link for passwordless sign-up/login
-      const { data: otpData, error: otpError } = await supabase.auth.signInWithOtp({
+      const { error: otpError } = await supabase.auth.signInWithOtp({
         email,
         options: {
           emailRedirectTo: `${window.location.origin}/lesson/intro`,
