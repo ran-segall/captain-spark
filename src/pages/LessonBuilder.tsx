@@ -86,7 +86,7 @@ const LessonBuilder: React.FC = () => {
   const uploadFile = async (file: File, path: string) => {
     setUploading(true);
     setUploadError(null);
-    const { data, error } = await supabase.storage.from('content').upload(path, file, { upsert: true });
+    const { error } = await supabase.storage.from('content').upload(path, file, { upsert: true });
     setUploading(false);
     if (error) {
       setUploadError(error.message);
