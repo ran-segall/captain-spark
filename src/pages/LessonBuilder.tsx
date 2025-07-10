@@ -43,7 +43,6 @@ const LessonBuilder: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [newCourse, setNewCourse] = useState({ title: '', description: '', order: 1 });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editCourse, setEditCourse] = useState({ title: '', description: '', order: 1 });
 
@@ -163,7 +162,7 @@ const LessonBuilder: React.FC = () => {
   const handleEdit = async (id: string) => {
     setLoading(true);
     setError(null);
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('courses')
       .update({ ...editCourse })
       .eq('id', id)
@@ -197,7 +196,7 @@ const LessonBuilder: React.FC = () => {
   const handleCreateLesson = async () => {
     setLessonLoading(true);
     setLessonError(null);
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('lessons')
       .insert([{ ...newLesson }])
       .select();
@@ -227,7 +226,7 @@ const LessonBuilder: React.FC = () => {
   const handleEditLesson = async (id: string) => {
     setLessonLoading(true);
     setLessonError(null);
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('lessons')
       .update({ ...editLesson })
       .eq('id', id)
@@ -264,12 +263,12 @@ const LessonBuilder: React.FC = () => {
   const handleCreateSlide = async () => {
     setSlideLoading(true);
     setSlideError(null);
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('slides')
       .insert([{ ...newSlide }])
       .select();
     if (error) setSlideError(error.message);
-    else setSlides(prev => [...prev, ...((data || []).map(s => ({ ...s, type: s.type as 'video' | 'quiz' })))]);
+    else setSlides(prev => [...prev, ...((data || []).map((s: any) => ({ ...s, type: s.type as 'video' | 'quiz' })))]);
     setNewSlide({ lesson_id: '', type: 'video', order: 1 });
     setSlideLoading(false);
   };
@@ -294,7 +293,7 @@ const LessonBuilder: React.FC = () => {
   const handleEditSlide = async (id: string) => {
     setSlideLoading(true);
     setSlideError(null);
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('slides')
       .update({ ...editSlide })
       .eq('id', id)
