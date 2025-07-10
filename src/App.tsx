@@ -11,6 +11,7 @@ import ReadyToStart from './pages/onboarding/ReadyToStart';
 import StartLater from './pages/onboarding/StartLater';
 import Confirm from './pages/onboarding/Confirm';
 import LessonIntro from './pages/onboarding/LessonIntro';
+import LessonBuilder from './pages/LessonBuilder';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/onboarding/start-later" element={<StartLater />} />
         <Route path="/onboarding/confirm" element={<Confirm />} />
         <Route path="/onboarding/lesson-intro" element={<LessonIntro />} />
+        <Route path="/lesson-builder" element={<LessonBuilder />} />
       </Routes>
     </Router>
   );
