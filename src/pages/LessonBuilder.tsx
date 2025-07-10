@@ -143,20 +143,6 @@ const LessonBuilder: React.FC = () => {
       });
   }, [authed]);
 
-  // Create course
-  const handleCreate = async () => {
-    setLoading(true);
-    setError(null);
-    const { data, error } = await supabase
-      .from('courses')
-      .insert([{ ...newCourse }])
-      .select();
-    if (error) setError(error.message);
-    else setCourses(prev => [...prev, ...(data || [])]);
-    setNewCourse({ title: '', description: '', order: 1 });
-    setLoading(false);
-  };
-
   // Delete course
   const handleDelete = async (id: string) => {
     setLoading(true);
