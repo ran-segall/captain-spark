@@ -12,7 +12,7 @@ const KidAge = () => {
   const handleContinue = () => {
     // Store in localStorage as a temporary global state
     localStorage.setItem('childAge', childAge);
-    navigate('/onboarding/email');
+    navigate('/onboarding/create-account');
   };
 
   const isValidAge = () => {
