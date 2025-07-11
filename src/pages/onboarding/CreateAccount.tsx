@@ -225,7 +225,7 @@ const CreateAccount = () => {
       // 6. Clear localStorage after successful submission
       localStorage.removeItem('parentName');
       localStorage.removeItem('childAge');
-      // Do NOT remove childName here, so it is available for ReadyToStart and later steps
+      localStorage.removeItem('childName');
 
       // 7. Mobile: pause and rewind video, show play overlay
       if (isMobile) {
@@ -276,7 +276,7 @@ const CreateAccount = () => {
 
   const handleVideoEnd = () => {
     if (showVideo) {
-      navigate('/onboarding/ready-to-start');
+      navigate('/onboarding/account-verify');
     }
   };
 
@@ -449,8 +449,9 @@ const CreateAccount = () => {
                   }}
                   aria-label="Play Welcome Video"
                 >
-                  <svg width="40%" height="40%" viewBox="0 0 100 100" style={{ display: 'block', margin: 'auto' }}>
-                    <polygon points="35,20 80,50 35,80" fill="white" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.18))' }} />
+                  <svg width="80%" height="80%" viewBox="0 0 100 100" style={{ display: 'block', margin: 'auto' }}>
+                    {/* Larger triangle, centered */}
+                    <polygon points="30,15 85,50 30,85" fill="white" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.18))' }} />
                   </svg>
                 </button>
               </div>

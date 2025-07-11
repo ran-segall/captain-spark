@@ -2,7 +2,7 @@ import AppLayout from '../../components/ScreenLayout';
 import Button from '../../components/Button';
 import { useNavigate } from 'react-router-dom';
 
-const StartLater = () => {
+const AccountVerify = () => {
   const navigate = useNavigate();
 
   const handleStartNow = () => {
@@ -31,16 +31,17 @@ const StartLater = () => {
             style={{ maxWidth: '40%', height: 'auto', marginBottom: '1.5rem', borderRadius: 12, display: 'block' }}
           />
           <h1 style={{ fontSize: '2rem', fontWeight: 900, color: '#163657', lineHeight: 1.1, margin: 0, textAlign: 'left' }}>
-            We’ll send you an email reminder with a link to the first lesson.
+            We've sent you an account verification email, please check your inbox.
           </h1>
         </div>
         <div style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <Button
             onClick={handleStartNow}
-            variant="primary"
+            variant="disabled"
             fullWidth
+            disabled
           >
-            Start Now
+            Check Your Inbox
           </Button>
         </div>
       </div>
@@ -48,4 +49,4 @@ const StartLater = () => {
   );
 };
 
-export default StartLater; 
+export default AccountVerify; 
