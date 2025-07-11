@@ -78,6 +78,14 @@ const CreateAccount = () => {
     });
   }, []);
 
+  // Play video muted on mount (mobile and desktop)
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = true;
+      videoRef.current.play().catch(() => {}); // ignore autoplay errors
+    }
+  }, []);
+
   // Handle video and audio synchronization when video is shown
   useEffect(() => {
     const video = videoRef.current;
@@ -219,15 +227,14 @@ const CreateAccount = () => {
       localStorage.removeItem('childAge');
       // Do NOT remove childName here, so it is available for ReadyToStart and later steps
 
-      // 7. Mobile: show play overlay, Desktop: auto-play
+      // 7. Mobile: pause and rewind video, show play overlay
       if (isMobile) {
-        setShowVideo(true); // show video UI
-        setShowPlayOverlay(true); // show play overlay
-        // Pause video on first frame
+        setShowVideo(true);
+        setShowPlayOverlay(true);
         setTimeout(() => {
           if (videoRef.current) {
-            videoRef.current.currentTime = 0;
             videoRef.current.pause();
+            videoRef.current.currentTime = 0;
           }
         }, 50);
       } else {
