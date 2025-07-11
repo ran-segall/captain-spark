@@ -42,6 +42,9 @@ const Spinner = () => (
   </svg>
 );
 
+// Utility to detect mobile
+const isMobile = typeof window !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+
 const CreateAccount = () => {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,6 +55,7 @@ const CreateAccount = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const welcomeAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [showPlayOverlay, setShowPlayOverlay] = useState(false); // for mobile tap-to-play
 
   // Use useMemo to create object URL only when blob changes
   const welcomeAudioUrl = useMemo(
@@ -207,32 +211,56 @@ const CreateAccount = () => {
         audioBlob = null;
       }
 
-      // 5. Set the audio blob and show video
-      console.log('Setting audio blob and showing video:', { hasAudioBlob: !!audioBlob });
+      // 5. Set the audio blob
       setWelcomeAudioBlob(audioBlob);
-      setShowVideo(true);
 
       // 6. Clear localStorage after successful submission
       localStorage.removeItem('parentName');
       localStorage.removeItem('childAge');
       // Do NOT remove childName here, so it is available for ReadyToStart and later steps
 
-      // 7. Start the video after a small delay to ensure audio is ready
-      setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.currentTime = 0;
-          videoRef.current.muted = audioBlob ? true : false;
-          console.log('Starting video with muted:', audioBlob ? true : false);
-          videoRef.current.play();
-          videoRef.current.style.zIndex = '1';
-        }
-      }, 100);
+      // 7. Mobile: show play overlay, Desktop: auto-play
+      if (isMobile) {
+        setShowVideo(true); // show video UI
+        setShowPlayOverlay(true); // show play overlay
+        // Pause video on first frame
+        setTimeout(() => {
+          if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+            videoRef.current.pause();
+          }
+        }, 50);
+      } else {
+        setShowVideo(true);
+        setTimeout(() => {
+          if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+            videoRef.current.muted = audioBlob ? true : false;
+            videoRef.current.play();
+            videoRef.current.style.zIndex = '1';
+          }
+        }, 100);
+      }
     } catch (error) {
       console.error('Error submitting form:', error);
       alert('An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Play handler for mobile overlay
+  const handleMobilePlay = () => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.muted = welcomeAudioBlob ? true : false;
+      videoRef.current.play();
+    }
+    if (welcomeAudioRef.current && welcomeAudioBlob) {
+      welcomeAudioRef.current.currentTime = 0;
+      welcomeAudioRef.current.play();
+    }
+    setShowPlayOverlay(false);
   };
 
   const handleVideoReady = () => {
@@ -375,32 +403,79 @@ const CreateAccount = () => {
               zIndex: 1,
             }}
           >
+            {/* Play overlay for mobile */}
+            {showPlayOverlay && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 10,
+                  background: 'rgba(0,0,0,0.15)',
+                  backdropFilter: 'blur(4px)',
+                }}
+              >
+                <button
+                  onClick={handleMobilePlay}
+                  style={{
+                    border: 'none',
+                    background: 'rgba(255,255,255,0.25)',
+                    borderRadius: '50%',
+                    width: '30vw',
+                    height: '30vw',
+                    minWidth: 120,
+                    minHeight: 120,
+                    maxWidth: 240,
+                    maxHeight: 240,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)',
+                    backdropFilter: 'blur(8px)',
+                    cursor: 'pointer',
+                    outline: 'none',
+                  }}
+                  aria-label="Play Welcome Video"
+                >
+                  <svg width="40%" height="40%" viewBox="0 0 100 100" style={{ display: 'block', margin: 'auto' }}>
+                    <polygon points="35,20 80,50 35,80" fill="white" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.18))' }} />
+                  </svg>
+                </button>
+              </div>
+            )}
             {/* Clickable overlay for rewind functionality (z-index: 2) */}
-            <div
-              onClick={e => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const clickX = e.clientX - rect.left;
-                const clickPercentage = (clickX / rect.width) * 100;
-                if (clickPercentage <= 30 && videoRef.current) {
-                  videoRef.current.currentTime = 0;
-                  videoRef.current.play();
-                }
-                if (welcomeAudioRef.current) {
-                  welcomeAudioRef.current.currentTime = 0;
-                }
-              }}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                zIndex: 2,
-                cursor: 'pointer',
-                background: 'transparent',
-                pointerEvents: 'auto',
-              }}
-            />
+            {!showPlayOverlay && (
+              <div
+                onClick={e => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const clickX = e.clientX - rect.left;
+                  const clickPercentage = (clickX / rect.width) * 100;
+                  if (clickPercentage <= 30 && videoRef.current) {
+                    videoRef.current.currentTime = 0;
+                    videoRef.current.play();
+                  }
+                  if (welcomeAudioRef.current) {
+                    welcomeAudioRef.current.currentTime = 0;
+                  }
+                }}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  zIndex: 2,
+                  cursor: 'pointer',
+                  background: 'transparent',
+                  pointerEvents: 'auto',
+                }}
+              />
+            )}
             {/* Overlays always above video and clickable area (z-index: 3) */}
             <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', zIndex: 3, pointerEvents: 'auto' }}>
               <div style={{ margin: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
