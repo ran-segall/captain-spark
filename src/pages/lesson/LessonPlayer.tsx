@@ -6,7 +6,6 @@ import LessonProgressBar from './LessonProgressBar';
 import { useAssetPreloader } from '../../hooks/useAssetPreloader';
 import AppLayout from '../../components/ScreenLayout';
 import Spinner from '../../components/Spinner';
-import React from 'react';
 import BackIcon from '../../assets/icons/back-icon-video.svg';
 import { useNavigate } from 'react-router-dom';
 
@@ -41,7 +40,7 @@ const LessonPlayer = ({ lessonId, userId }: LessonPlayerProps) => {
   const navigate = useNavigate();
 
   // Always call the hook, even if slides is empty
-  const { nextLoading, nextLoaded } = useAssetPreloader(slides, currentSlideIdx);
+  const { nextLoaded } = useAssetPreloader(slides, currentSlideIdx);
 
   useEffect(() => {
     setCurrentSlideIdx(0);
@@ -146,13 +145,6 @@ const LessonPlayer = ({ lessonId, userId }: LessonPlayerProps) => {
   }, [lessonId, slides.length, userId, progress]);
 
   // Navigation handlers
-  const goToNextSlide = () => {
-    if (currentSlideIdx < slides.length - 1) {
-      const nextIdx = currentSlideIdx + 1;
-      setCurrentSlideIdx(nextIdx);
-      updateProgress(nextIdx);
-    }
-  };
   const goToPrevSlide = () => {
     if (currentSlideIdx > 0) {
       const prevIdx = currentSlideIdx - 1;

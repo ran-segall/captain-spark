@@ -1,7 +1,7 @@
 import type { Slide, QuizSlide as QuizSlideType } from '../../data/types';
 import VideoSlide from './VideoSlide';
 import QuizSlide from './QuizSlide';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { RefObject } from 'react';
 
 interface SlideRendererProps {

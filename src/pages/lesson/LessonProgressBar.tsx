@@ -13,9 +13,6 @@ const PILL_WIDTH = 40;
 const CIRCLE_SIZE = 8;
 
 const LessonProgressBar: React.FC<LessonProgressBarProps> = ({ slides, currentIdx, currentProgress = 0 }) => {
-  // Count how many video and quiz slides
-  const videoCount = slides.filter(s => s.type === 'video').length;
-  const quizCount = slides.filter(s => s.type === 'quiz').length;
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: PILL_GAP, width: '100%', height: PILL_HEIGHT, margin: 0, padding: 0 }}>
       {slides.map((slide, idx) => {
