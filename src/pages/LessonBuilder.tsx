@@ -92,9 +92,8 @@ const LessonBuilder: React.FC = () => {
       setUploadError(error.message);
       return null;
     }
-    // Get public URL
-    const { data: urlData } = supabase.storage.from('content').getPublicUrl(path);
-    return urlData?.publicUrl || null;
+    // Store only the relative path in the DB
+    return path;
   };
 
   // Fetch courses

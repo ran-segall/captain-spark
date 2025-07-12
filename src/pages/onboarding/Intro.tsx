@@ -5,37 +5,7 @@ import { useRef, useState } from 'react';
 import { VIDEO_PATHS } from '../../utils/videoPaths';
 import ProgressBar from '../../components/ProgressBar';
 import BackIcon from '../../assets/icons/back-icon-video.svg';
-
-const Spinner = () => (
-  <svg
-    width="32"
-    height="32"
-    viewBox="0 0 20 20"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    style={{ marginRight: 0, verticalAlign: 'middle', display: 'inline-block' }}
-  >
-    <circle
-      cx="10"
-      cy="10"
-      r="8"
-      stroke="#222"
-      strokeWidth="3"
-      strokeDasharray="40 20"
-      strokeLinecap="round"
-      fill="none"
-    >
-      <animateTransform
-        attributeName="transform"
-        type="rotate"
-        from="0 10 10"
-        to="360 10 10"
-        dur="0.8s"
-        repeatCount="indefinite"
-      />
-    </circle>
-  </svg>
-);
+import Spinner from '../../components/Spinner';
 
 function Intro() {
   const navigate = useNavigate();
@@ -83,6 +53,7 @@ function Intro() {
           muted
           autoPlay
           playsInline
+          data-background="true"
           style={{
             position: 'absolute',
             zIndex: 0,
@@ -228,7 +199,7 @@ function Intro() {
                 justifyContent: 'center',
                 zIndex: 9999
               }}>
-                <Spinner />
+                <Spinner color="#fff" />
                 <div style={{ color: '#fff', fontSize: '1.2rem', marginTop: 16 }}>Loading</div>
               </div>
             )}

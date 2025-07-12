@@ -551,3 +551,35 @@ const CreateAccount = () => {
 };
 
 export default CreateAccount; 
+
+export async function ensureCustomUserRow({ parentName, kidName, kidAge, email }: {
+  parentName: string;
+  kidName: string;
+  kidAge: number;
+  email: string;
+}) {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw new Error('Error fetching authenticated user: ' + authError.message);
+  if (!user) throw new Error('No authenticated user. Make sure user is logged in and session is established.');
+
+  // Check if user already exists in custom users table
+  const { data: existing, error: fetchError } = await supabase
+    .from('users')
+    .select('id')
+    .eq('id', user.id);
+  if (fetchError) throw fetchError;
+  if (existing && existing.length > 0) return; // User already exists
+
+  // Insert user row with Supabase Auth user ID as primary key
+  const insertObj = {
+    id: user.id,
+    parent_name: parentName,
+    kid_name: kidName,
+    kid_age: kidAge,
+    email,
+    lesson_progress: {},
+    lesson_feedback: {},
+  };
+  const { error: insertError } = await supabase.from('users').insert([insertObj]);
+  if (insertError) throw insertError;
+} 

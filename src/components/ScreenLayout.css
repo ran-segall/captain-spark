@@ -28,7 +28,8 @@
     z-index: 1;
   }
 
-  .app-wrapper video {
+  /* Only apply full-screen styling to background videos, not content videos */
+  .app-wrapper video[data-background="true"] {
     width: 100vw;
     height: 100vh;
     object-fit: cover;

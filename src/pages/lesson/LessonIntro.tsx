@@ -1,6 +1,8 @@
 import AppLayout from '../../components/ScreenLayout';
 import Button from '../../components/Button';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { supabase } from '../../utils/supabaseClient';
 
 /**
  * LessonIntro page: Introduces lesson one (Treasure Tracker) with themed image and description.
@@ -8,9 +10,40 @@ import { useNavigate } from 'react-router-dom';
  */
 function LessonIntro() {
   const navigate = useNavigate();
+  const [userId, setUserId] = useState<string | null>(null);
+  const [lessonId, setLessonId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const email = user?.email;
+      if (!email) {
+        navigate('/onboarding');
+        return;
+      }
+      // Look up user in custom users table by email
+      const { data: existing, error } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email);
+      if (error || !existing || existing.length === 0) {
+        navigate('/onboarding');
+        return;
+      }
+      setUserId(existing[0].id);
+    };
+    getUser();
+  }, [navigate]);
+
+  useEffect(() => {
+    // Use the correct lesson id for course 1
+    setLessonId('730c367b-b4b2-46d0-80e9-0eb63d42b840');
+  }, []);
 
   const handleGetStarted = () => {
-    navigate('/onboarding/ready');
+    if (userId && lessonId) {
+      navigate(`/lesson/${lessonId}?user=${userId}`);
+    }
   };
 
   return (
@@ -58,7 +91,7 @@ function LessonIntro() {
             </p>
           </div>
           <div style={{ marginTop: 'auto', width: '100%', flexShrink: 0 }}>
-            <Button variant="primary" onClick={handleGetStarted}>
+            <Button variant="primary" onClick={handleGetStarted} disabled={!userId || !lessonId}>
               Get Started
             </Button>
           </div>
