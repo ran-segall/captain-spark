@@ -7,6 +7,7 @@ import { useAssetPreloader } from '../../hooks/useAssetPreloader';
 import AppLayout from '../../components/ScreenLayout';
 import Spinner from '../../components/Spinner';
 import BackIcon from '../../assets/icons/back-icon-video.svg';
+const BLUE_BACK_ICON = '/images/ui/back-blue.svg';
 import { useNavigate } from 'react-router-dom';
 
 interface LessonPlayerProps {
@@ -214,6 +215,8 @@ const LessonPlayer = ({ lessonId, userId }: LessonPlayerProps) => {
 
   const currentSlide = slides[currentSlideIdx];
   const isVideoSlide = currentSlide.type === 'video';
+  const isQuizSlide = currentSlide.type === 'quiz';
+  const backIconSrc = isQuizSlide ? BLUE_BACK_ICON : BackIcon;
 
   return (
     <AppLayout>
@@ -244,6 +247,7 @@ const LessonPlayer = ({ lessonId, userId }: LessonPlayerProps) => {
               slides={slides}
               currentIdx={currentSlideIdx}
               currentProgress={isVideoSlide ? videoProgress : 0}
+              variant={isQuizSlide ? 'blue' : 'default'}
             />
           </div>
           <button
@@ -259,11 +263,11 @@ const LessonPlayer = ({ lessonId, userId }: LessonPlayerProps) => {
               display: 'flex',
               alignItems: 'center',
               boxShadow: 'none',
-              alignSelf: 'flex-start', // left align
+              alignSelf: 'flex-start',
             }}
             aria-label="Back"
           >
-            <img src={BackIcon} alt="Back" style={{ width: 28, height: 28 }} />
+            <img src={backIconSrc} alt="Back" style={{ width: 28, height: 28 }} />
           </button>
         </div>
         {/* Main content area */}

@@ -73,6 +73,7 @@ const Button: React.FC<ButtonProps> = ({
 }) => {
   // If disabled prop is true or variant is 'disabled', treat as disabled
   const isDisabled = disabled || variant === 'disabled' || loading;
+  const useDisabledStyle = variant === 'disabled';
   const style = {
     ...{
       border: 'none',
@@ -88,7 +89,7 @@ const Button: React.FC<ButtonProps> = ({
       display: 'block',
       textAlign: 'center',
     },
-    ...VARIANT_STYLES[variant === 'disabled' ? 'disabled' : variant],
+    ...(useDisabledStyle ? VARIANT_STYLES['disabled'] : VARIANT_STYLES[variant]),
   } as React.CSSProperties;
 
   return (
