@@ -13,7 +13,6 @@ const VideoSlide: React.FC<VideoSlideProps> = ({ videoUrl, onEnded, videoRef, on
   const ref = videoRef || localRef;
   const [error, setError] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
   useEffect(() => {
     if (ref.current) {
@@ -22,7 +21,6 @@ const VideoSlide: React.FC<VideoSlideProps> = ({ videoUrl, onEnded, videoRef, on
       setIsPlaying(false);
     }
     setError(false);
-    setHasUserInteracted(false);
   }, [videoUrl, ref]);
 
   const handlePlay = async () => {
@@ -30,7 +28,6 @@ const VideoSlide: React.FC<VideoSlideProps> = ({ videoUrl, onEnded, videoRef, on
       try {
         await ref.current.play();
         setIsPlaying(true);
-        setHasUserInteracted(true);
       } catch (err) {
         console.error('Failed to play video:', err);
         setError(true);
