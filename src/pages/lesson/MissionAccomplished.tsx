@@ -97,7 +97,7 @@ const MissionAccomplished: React.FC = () => {
   }, [startXP, endXP]);
 
   const handleContinue = () => {
-    navigate(`/day-streak?user=${userId}${lessonId ? `&lesson=${lessonId}` : ''}`);
+    navigate(`/lesson/day-streak?user=${userId}${lessonId ? `&lesson=${lessonId}` : ''}`);
   };
 
   return (
@@ -120,16 +120,28 @@ const MissionAccomplished: React.FC = () => {
           minHeight: 0,
           padding: '2rem',
         }}>
-          <img
-            src={'/images/post-lesson/mission-accomplished.jpg'}
-            alt="Mission Accomplished"
-            style={{
-              maxWidth: '70%',
-              maxHeight: 260,
-              objectFit: 'contain',
-              marginBottom: '2rem',
-            }}
-          />
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            minHeight: 0,
+            marginBottom: '2rem',
+          }}>
+            <img
+              src={'/images/post-lesson/mission-accomplished.jpg'}
+              alt="Mission Accomplished"
+              style={{
+                width: '100%',
+                height: '100%',
+                maxWidth: 340,
+                objectFit: 'contain',
+                flexGrow: 1,
+                minHeight: 0,
+              }}
+            />
+          </div>
           <h1 style={{ margin: 0, marginBottom: '1.2rem',textAlign: 'center' }}>Mission Accomplished!</h1>
           <div style={{
             fontSize: '1rem',
