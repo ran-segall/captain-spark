@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AppLayout from '../../components/ScreenLayout';
 import Button from '../../components/Button';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { supabase } from '../../utils/supabaseClient';
 
 const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
