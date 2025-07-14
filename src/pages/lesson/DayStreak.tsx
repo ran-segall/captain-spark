@@ -52,10 +52,8 @@ const getStreakArray = (streak_count: number, last_streak_date: string | null) =
 };
 
 const DayStreak: React.FC = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const userId = new URLSearchParams(location.search).get('user');
-  const lessonId = new URLSearchParams(location.search).get('lesson');
 
   const [streak, setStreak] = useState(0);
   const [displayStreak, setDisplayStreak] = useState(0);
@@ -83,7 +81,6 @@ const DayStreak: React.FC = () => {
       const today = getToday();
       const yesterday = getYesterday();
       let newStreak = streak_count || 0;
-      let newLast = today;
       if (last_streak_date === today) {
         // Already counted today
       } else if (last_streak_date === yesterday) {
