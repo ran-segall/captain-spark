@@ -10,11 +10,6 @@ import BackIcon from '../../assets/icons/back-icon-video.svg';
 const BLUE_BACK_ICON = '/images/ui/back-blue.svg';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
-interface LessonPlayerProps {
-  lessonId: string;
-  userId: string;
-}
-
 const getSignedUrl = async (path: string | undefined | null) => {
   if (!path) return undefined;
   console.log('Requesting signed URL for path: [' + path + ']');
