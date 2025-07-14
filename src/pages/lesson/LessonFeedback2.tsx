@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AppLayout from '../../components/ScreenLayout';
 import Button from '../../components/Button';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { supabase } from '../../utils/supabaseClient';
 import '../../styles/typography.css';
 
@@ -13,7 +13,6 @@ const OPTIONS = [
 ];
 
 const LessonFeedback2: React.FC = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const userId = new URLSearchParams(location.search).get('user');
   const lessonId = new URLSearchParams(location.search).get('lesson');
