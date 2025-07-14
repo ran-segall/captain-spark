@@ -3,6 +3,7 @@ import type { QuizSlide as QuizSlideType, QuizAnswer } from '../../data/types';
 import Button from '../../components/Button';
 import SpeechBubble from '../../components/SpeechBubble';
 import './QuizSlide.css';
+import '../../styles/typography.css';
 
 const SPARK_AVATAR = '/images/ui/spark-profile.png';
 const GLIMM_AVATAR = '/images/ui/glimm-profile.png';
@@ -13,6 +14,16 @@ interface QuizSlideProps {
 }
 
 type AnswerStatus = null | 'correct' | 'wrong';
+
+const renderWithHighlight = (text?: string) => {
+  if (!text) return null;
+  return text.split(/(\[hl\].*?\[\/hl\])/g).map((part, i) => {
+    if (part.startsWith('[hl]') && part.endsWith('[/hl]')) {
+      return <span key={i} className="highlight-underline">{part.slice(4, -5)}</span>;
+    }
+    return part;
+  });
+};
 
 const QuizSlide: React.FC<QuizSlideProps> = ({ slide, onAnswer }) => {
   const [imgErrors, setImgErrors] = useState<{ [key: number]: boolean }>({});
@@ -120,7 +131,7 @@ const QuizSlide: React.FC<QuizSlideProps> = ({ slide, onAnswer }) => {
       </div>
       {/* Heading and Answers */}
       <div className={qaClass}>
-        <h2 className="quiz-heading">{slide.quiz_heading || 'Quiz'}</h2>
+        <h2 className="quiz-heading">{renderWithHighlight(slide.quiz_heading || 'Quiz')}</h2>
         {/* Answers 2x2 grid */}
         <div className="quiz-answers-grid">
           {slide.quiz_answers.map((answer: QuizAnswer, idx: number) => {

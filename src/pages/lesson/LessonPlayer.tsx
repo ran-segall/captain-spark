@@ -8,7 +8,7 @@ import AppLayout from '../../components/ScreenLayout';
 import Spinner from '../../components/Spinner';
 import BackIcon from '../../assets/icons/back-icon-video.svg';
 const BLUE_BACK_ICON = '/images/ui/back-blue.svg';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
 interface LessonPlayerProps {
   lessonId: string;
@@ -27,7 +27,15 @@ const getSignedUrl = async (path: string | undefined | null) => {
   return data.signedUrl;
 };
 
-const LessonPlayer = ({ lessonId, userId }: LessonPlayerProps) => {
+const LessonPlayer = (props: Partial<{ lessonId: string; userId: string }>) => {
+  const params = useParams();
+  const location = useLocation();
+
+  // Get lessonId from route params or props
+  const lessonId = props.lessonId || params.lessonId;
+  // Get userId from props or query string
+  const userId = props.userId || new URLSearchParams(location.search).get('user');
+
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [slides, setSlides] = useState<Slide[]>([]);
   const [progress, setProgress] = useState<any>(null); // TODO: type user progress
@@ -130,10 +138,11 @@ const LessonPlayer = ({ lessonId, userId }: LessonPlayerProps) => {
 
   // Progress update logic (to Supabase)
   const updateProgress = useCallback(async (slideIdx: number) => {
+    if (!lessonId) return;
     try {
       const newProgress = {
         ...progress,
-        [lessonId]: { slide: slideIdx, completed: slideIdx >= slides.length - 1 },
+        [String(lessonId)]: { slide: slideIdx, completed: slideIdx >= slides.length - 1 },
       };
       setProgress(newProgress);
       await supabase
@@ -160,6 +169,9 @@ const LessonPlayer = ({ lessonId, userId }: LessonPlayerProps) => {
       const nextIdx = currentSlideIdx + 1;
       setCurrentSlideIdx(nextIdx);
       updateProgress(nextIdx);
+    } else {
+      // Last slide completed: navigate to Mission Accomplished
+      navigate(`/lesson/mission-accomplished?user=${userId}&lesson=${lessonId}`);
     }
   };
 

@@ -12,6 +12,7 @@ import Confirm from './pages/onboarding/Confirm';
 import LessonIntro from './pages/lesson/LessonIntro';
 import LessonBuilder from './pages/LessonBuilder';
 import LessonPlayerWrapper from './pages/lesson/LessonPlayerWrapper';
+import MissionAccomplished from './pages/lesson/MissionAccomplished';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/onboarding/account-verify" element={<AccountVerify />} />
           <Route path="/onboarding/confirm" element={<Confirm />} />
           <Route path="/lesson/intro" element={<LessonIntro />} />
+          <Route path="/lesson/mission-accomplished" element={<MissionAccomplished />} />
           <Route path="/lesson/:lessonId" element={<LessonPlayerWrapper />} />
           <Route path="/lesson-builder" element={<LessonBuilder />} />
         </Routes>
