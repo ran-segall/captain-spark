@@ -5,16 +5,19 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Environment-based redirect URL configuration
 const getRedirectUrl = () => {
-  // Check if we're in development mode
   if (import.meta.env.DEV) {
-    // Use localhost for development
+    console.log('[getRedirectUrl] DEV mode: using localhost redirect');
     return 'http://localhost:5173/lesson/intro';
   } else {
-    // Use production URL for deployed version
-    // You can set this as an environment variable or use a default
-    return import.meta.env.VITE_PRODUCTION_URL 
-      ? `${import.meta.env.VITE_PRODUCTION_URL}/lesson/intro`
-      : 'https://captain-spark.vercel.app/lesson/intro'; // Default Vercel deployment URL
+    const envUrl = import.meta.env.VITE_PRODUCTION_URL;
+    const url = envUrl
+      ? `${envUrl}/lesson/intro`
+      : 'https://captain-spark.vercel.app/lesson/intro';
+    console.log('[getRedirectUrl] PROD mode:', {
+      VITE_PRODUCTION_URL: envUrl,
+      redirectUrl: url
+    });
+    return url;
   }
 };
 
