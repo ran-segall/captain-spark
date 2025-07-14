@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AppLayout from '../../components/ScreenLayout';
 import Button from '../../components/Button';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../../utils/supabaseClient';
 
 const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
@@ -53,6 +53,7 @@ const getStreakArray = (streak_count: number, last_streak_date: string | null) =
 
 const DayStreak: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const userId = new URLSearchParams(location.search).get('user');
 
   const [streak, setStreak] = useState(0);
@@ -110,8 +111,11 @@ const DayStreak: React.FC = () => {
   }, [streakArr]);
 
   const handleContinue = () => {
-    // TODO: navigate to feedback or next screen
-    // navigate(`/feedback?user=${userId}${lessonId ? `&lesson=${lessonId}` : ''}`);
+    if (!userId) return;
+    // Assume lessonId is passed in the query string if needed
+    const params = new URLSearchParams(location.search);
+    const lessonId = params.get('lesson');
+    navigate(`/lesson/lesson-feedback-1?user=${userId}${lessonId ? `&lesson=${lessonId}` : ''}`);
   };
 
   return (
