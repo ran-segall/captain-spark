@@ -6,9 +6,6 @@ import './QuizSlide.css';
 
 const SPARK_AVATAR = '/images/ui/spark-profile.png';
 const GLIMM_AVATAR = '/images/ui/glimm-profile.png';
-const BRAND_BLUE = '#163657';
-const CORRECT_GREEN = '#0DB207';
-const WRONG_RED = '#680203';
 
 interface QuizSlideProps {
   slide: QuizSlideType;
