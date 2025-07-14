@@ -6,7 +6,7 @@ import ProgressBar from '../../components/ProgressBar';
 import Button from '../../components/Button';
 import BackIcon from '../../assets/icons/back-icon-blue.svg';
 import BackIconVideo from '../../assets/icons/back-icon-video.svg';
-import { supabase } from '../../utils/supabaseClient';
+import { supabase, getRedirectUrl } from '../../utils/supabaseClient';
 import videoPreloader from '../../utils/videoPreloader';
 import { VIDEO_PATHS } from '../../utils/videoPaths';
 import { generateWelcomeAudio } from '../../utils/elevenlabsClient';
@@ -164,7 +164,7 @@ const CreateAccount = () => {
       const { error: otpError } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/lesson/intro`,
+          emailRedirectTo: getRedirectUrl(),
         },
       });
       if (otpError) {
