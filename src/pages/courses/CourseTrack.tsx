@@ -37,32 +37,7 @@ const CourseTrack: React.FC = () => {
   const [initError, setInitError] = useState<string | null>(null);
   const [courseTitle, setCourseTitle] = useState<string>('');
   const [kidName, setKidName] = useState<string>('');
-  const [isMagicLinkRedirect, setIsMagicLinkRedirect] = useState(false);
   const [resolvedUserId, setResolvedUserId] = useState<string | null>(userId);
-
-  // Check if this is a magic link redirect and get user data
-  useEffect(() => {
-    const checkMagicLinkAndGetUser = async () => {
-      // Check if we have a session (magic link redirect)
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setIsMagicLinkRedirect(true);
-        // Get user data from our custom users table
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('kid_name, lesson_progress')
-          .eq('id', session.user.id)
-          .single();
-        
-        if (!userError && userData) {
-          setKidName(userData.kid_name || '');
-          setProgress(userData.lesson_progress || {});
-        }
-      }
-    };
-    
-    checkMagicLinkAndGetUser();
-  }, []);
 
   // Resolve userId from session if not present in URL, using email lookup in custom users table
   useEffect(() => {
