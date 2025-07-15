@@ -17,6 +17,8 @@ import DayStreak from './pages/lesson/DayStreak';
 import LessonFeedback1 from './pages/lesson/LessonFeedback1';
 import LessonFeedback2 from './pages/lesson/LessonFeedback2';
 import CourseTrack from './pages/courses/CourseTrack';
+import LogIn from './pages/LogIn';
+import MagicLinkSent from './pages/MagicLinkSent';
 
 function App() {
   return (
@@ -40,6 +42,8 @@ function App() {
           <Route path="/lesson/:lessonId" element={<LessonPlayerWrapper />} />
           <Route path="/lesson-builder" element={<LessonBuilder />} />
           <Route path="/courses/CourseTrack" element={<CourseTrack />} />
+          <Route path="/magic-link-sent" element={<MagicLinkSent />} />
+          <Route path="/login" element={<LogIn />} />
         </Routes>
       </Router>
     </AuthProvider>

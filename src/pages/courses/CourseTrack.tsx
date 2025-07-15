@@ -21,50 +21,180 @@ const statusIcon: Record<LessonStatus, string> = {
   upcoming: '/images/ui/lesson-upcoming.jpg',
 };
 
-const DEFAULT_COURSE_ID = 'course-1'; // TODO: Replace with real course id or get from query param
-
 const CourseTrack: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const userId = new URLSearchParams(location.search).get('user');
-  const courseId = new URLSearchParams(location.search).get('course') || DEFAULT_COURSE_ID;
+  const courseId = new URLSearchParams(location.search).get('course');
   const lessonId = new URLSearchParams(location.search).get('lesson');
 
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [progress, setProgress] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [resolvedCourseId, setResolvedCourseId] = useState<string | null>(courseId !== DEFAULT_COURSE_ID ? courseId : null);
+  const [resolvedCourseId, setResolvedCourseId] = useState<string | null>(courseId || null);
   const [initLoading, setInitLoading] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
   const [courseTitle, setCourseTitle] = useState<string>('');
+  const [kidName, setKidName] = useState<string>('');
+  const [isMagicLinkRedirect, setIsMagicLinkRedirect] = useState(false);
+  const [resolvedUserId, setResolvedUserId] = useState<string | null>(userId);
 
-  // If courseId is not a real UUID, but lessonId is present, fetch the lesson to get its course_id
+  // Check if this is a magic link redirect and get user data
   useEffect(() => {
-    if (courseId !== DEFAULT_COURSE_ID) {
+    const checkMagicLinkAndGetUser = async () => {
+      // Check if we have a session (magic link redirect)
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setIsMagicLinkRedirect(true);
+        // Get user data from our custom users table
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('kid_name, lesson_progress')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (!userError && userData) {
+          setKidName(userData.kid_name || '');
+          setProgress(userData.lesson_progress || {});
+        }
+      }
+    };
+    
+    checkMagicLinkAndGetUser();
+  }, []);
+
+  // Resolve userId from session if not present in URL, using email lookup in custom users table
+  useEffect(() => {
+    const resolveUserId = async () => {
+      if (userId) {
+        setResolvedUserId(userId);
+        return;
+      }
+      // Get current auth user
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+      if (authError || !authData?.user?.email) {
+        setResolvedUserId(null);
+        return;
+      }
+      const email = authData.user.email;
+      // Look up custom user by email
+      const { data: userRows, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .limit(1);
+      if (userError || !userRows || userRows.length === 0) {
+        setResolvedUserId(null);
+        return;
+      }
+      setResolvedUserId(userRows[0].id);
+    };
+    resolveUserId();
+  }, [userId]);
+
+  // Dynamic course resolution based on user progress
+  useEffect(() => {
+    if (!resolvedUserId) return;
+    
+    // If courseId is provided, use it directly
+    if (courseId) {
       setResolvedCourseId(courseId);
       return;
     }
-    if (!lessonId) return;
-    setInitLoading(true);
-    setInitError(null);
-    (async () => {
-      try {
-        const { data, error } = await supabase.from('lessons').select('course_id').eq('id', lessonId).single();
-        if (error || !data?.course_id) {
+    
+    // If lessonId is provided, resolve course from lesson
+    if (lessonId) {
+      setInitLoading(true);
+      setInitError(null);
+      (async () => {
+        try {
+          const { data, error } = await supabase.from('lessons').select('course_id').eq('id', lessonId).single();
+          if (error || !data?.course_id) {
+            setInitError('Could not resolve course for this lesson.');
+            await resolveCourseFromProgress();
+          } else {
+            setResolvedCourseId(data.course_id);
+          }
+        } catch {
           setInitError('Could not resolve course for this lesson.');
-          setResolvedCourseId(null);
-        } else {
-          setResolvedCourseId(data.course_id);
+          await resolveCourseFromProgress();
+        } finally {
+          setInitLoading(false);
         }
-      } catch {
-        setInitError('Could not resolve course for this lesson.');
-        setResolvedCourseId(null);
-      } finally {
-        setInitLoading(false);
+      })();
+      return;
+    }
+    
+    // No courseId or lessonId provided - resolve from user progress
+    resolveCourseFromProgress();
+  }, [resolvedUserId, courseId, lessonId]);
+
+  // Function to resolve course from user progress
+  const resolveCourseFromProgress = async () => {
+    if (!resolvedUserId) return;
+    try {
+      // 1. Get user's progress
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('lesson_progress')
+        .eq('id', resolvedUserId)
+        .single();
+      let courseIdToUse = null;
+      if (userError || !userData?.lesson_progress) {
+        // No progress - use the first lesson in the system
+        const { data: lessons, error: firstLessonError } = await supabase
+          .from('lessons')
+          .select('course_id')
+          .order('order', { ascending: true })
+          .limit(1);
+        const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
+        if (firstLessonError || !firstLesson?.course_id) {
+          setInitError('Could not find any lessons.');
+          return;
+        }
+        courseIdToUse = firstLesson.course_id;
+      } else {
+        // Find completed lessons
+        const userProgress = userData.lesson_progress;
+        const completedLessons = Object.keys(userProgress).filter(
+          lessonId => userProgress[lessonId]?.completed
+        );
+        if (completedLessons.length === 0) {
+          // No completed lessons - use the first lesson in the system
+          const { data: lessons, error: firstLessonError } = await supabase
+            .from('lessons')
+            .select('course_id')
+            .order('order', { ascending: true })
+            .limit(1);
+          const firstLesson = lessons && lessons.length > 0 ? lessons[0] : null;
+          if (firstLessonError || !firstLesson?.course_id) {
+            setInitError('Could not find any lessons.');
+            return;
+          }
+          courseIdToUse = firstLesson.course_id;
+        } else {
+          // Use the course of the last completed lesson
+          const lastCompletedLessonId = completedLessons[completedLessons.length - 1];
+          const { data: lessons, error: lastLessonError } = await supabase
+            .from('lessons')
+            .select('course_id')
+            .eq('id', lastCompletedLessonId)
+            .limit(1);
+          const lastLesson = lessons && lessons.length > 0 ? lessons[0] : null;
+          if (lastLessonError || !lastLesson?.course_id) {
+            setInitError('Could not determine your current course.');
+            return;
+          }
+          courseIdToUse = lastLesson.course_id;
+        }
       }
-    })();
-  }, [courseId, lessonId]);
+      setResolvedCourseId(courseIdToUse);
+    } catch (error) {
+      console.error('Error resolving course from progress:', error);
+      setInitError('Could not determine your current course.');
+    }
+  };
 
   // Fetch course title when resolvedCourseId changes
   useEffect(() => {
@@ -77,37 +207,58 @@ const CourseTrack: React.FC = () => {
   }, [resolvedCourseId]);
 
   useEffect(() => {
-    if (!userId || !resolvedCourseId) return;
+    if (typeof resolvedUserId !== 'string' || !resolvedUserId.trim() || !resolvedCourseId) {
+      console.log('Skipping fetch: invalid resolvedUserId or resolvedCourseId', { resolvedUserId, resolvedCourseId });
+      return;
+    }
+    console.log('Fetching for user:', resolvedUserId, 'course:', resolvedCourseId);
     setLoading(true);
     setError(null);
-    Promise.all([
-      supabase.from('lessons').select('*').eq('course_id', resolvedCourseId).order('order', { ascending: true }),
-      supabase.from('users').select('lesson_progress').eq('id', userId).single(),
-    ])
-      .then(async ([lessonRes, userRes]) => {
+    (async () => {
+      try {
+        const lessonPromise = supabase.from('lessons').select('*').eq('course_id', resolvedCourseId).order('order', { ascending: true });
+        // Fetch both lesson_progress and kid_name
+        const userProgressPromise = supabase.from('users').select('lesson_progress, kid_name').eq('id', resolvedUserId).single();
+        const [lessonRes, userRes] = await Promise.all([lessonPromise, userProgressPromise]);
+        console.log('User progress fetch result', userRes);
         if (lessonRes.error) throw lessonRes.error;
         if (userRes.error) throw userRes.error;
         setLessons(lessonRes.data || []);
         let userProgress = userRes.data?.lesson_progress || {};
+        setKidName(userRes.data?.kid_name || '');
         // If lessonId is present and not marked complete, mark it as complete
         if (lessonId && lessonId in userProgress && !userProgress[lessonId]?.completed) {
           userProgress = {
             ...userProgress,
             [lessonId]: { ...(userProgress[lessonId] || {}), completed: true },
           };
-          await supabase.from('users').update({ lesson_progress: userProgress }).eq('id', userId);
+          try {
+            const updateRes = await supabase.from('users').update({ lesson_progress: userProgress }).eq('id', resolvedUserId);
+            console.log('Update result (existing lesson)', updateRes);
+          } catch (err) {
+            console.error('Update error (existing lesson)', err);
+          }
         } else if (lessonId && !(lessonId in userProgress)) {
           userProgress = {
             ...userProgress,
             [lessonId]: { completed: true },
           };
-          await supabase.from('users').update({ lesson_progress: userProgress }).eq('id', userId);
+          try {
+            const updateRes = await supabase.from('users').update({ lesson_progress: userProgress }).eq('id', resolvedUserId);
+            console.log('Update result (new lesson)', updateRes);
+          } catch (err) {
+            console.error('Update error (new lesson)', err);
+          }
         }
         setProgress(userProgress);
-      })
-      .catch((err) => setError(err.message || 'Failed to load course data'))
-      .finally(() => setLoading(false));
-  }, [userId, resolvedCourseId, lessonId]);
+      } catch (err) {
+        setError((err as Error).message || 'Failed to load course data');
+        console.error('Main data-fetching effect error:', err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [resolvedUserId, resolvedCourseId, lessonId]);
 
   // Determine lesson status for each lesson
   let foundCurrent = false;
@@ -125,9 +276,19 @@ const CourseTrack: React.FC = () => {
   const nextLesson = lessonsWithStatus.find((l) => l.status === 'current') || lessonsWithStatus.find((l) => l.status === 'upcoming');
 
   const handleGetStarted = () => {
-    if (userId && nextLesson) {
-      navigate(`/lesson/${nextLesson.id}?user=${userId}`);
+    if (resolvedUserId && nextLesson) {
+      navigate(`/lesson/${nextLesson.id}?user=${resolvedUserId}`);
     }
+  };
+
+  // Get the appropriate heading
+  const getHeading = () => {
+    // If arriving from login (no lessonId in URL), show welcome back
+    if (!lessonId && kidName) {
+      return `Welcome Back ${kidName}!`;
+    }
+    // If arriving from lesson feedback, show course title
+    return courseTitle || <span style={{ background: '#E6EAF0', borderRadius: 8, width: 180, height: 36, display: 'inline-block', animation: 'pulse 1.2s infinite' }} />;
   };
 
   // Skeleton UI for loading state
@@ -178,6 +339,16 @@ const CourseTrack: React.FC = () => {
     </div>
   );
 
+  if (!resolvedUserId) {
+    return (
+      <AppLayout>
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ color: '#163657', fontSize: 24 }}>Loading...</div>
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout>
       <div style={{
@@ -190,7 +361,8 @@ const CourseTrack: React.FC = () => {
         boxSizing: 'border-box',
         minHeight: 0,
       }}>
-        <h1 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>{courseTitle || <span style={{ background: '#E6EAF0', borderRadius: 8, width: 180, height: 36, display: 'inline-block', animation: 'pulse 1.2s infinite' }} />}</h1>
+        <div style={{ textAlign: 'center' }}>Course Progress</div>
+        <h1 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>{getHeading()}</h1>
         <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
           {initLoading ? (
             <Skeleton />

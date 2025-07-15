@@ -115,7 +115,7 @@ function Intro() {
             <div style={{ marginTop: 'auto', width: '100%', flexShrink: 0 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <Button variant="primary" onClick={handleGetStarted}>Get Started</Button>
-                <Button variant="secondary">Log In</Button>
+                <Button variant="secondary" onClick={() => navigate('/login')}>Log In</Button>
               </div>
             </div>
           </div>
