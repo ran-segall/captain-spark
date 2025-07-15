@@ -53,8 +53,10 @@ const LessonFeedback2: React.FC = () => {
       return;
     }
     setLoading(false);
-    // TODO: navigate to the next step (e.g., course track)
-    // navigate(`/lesson/course-track?user=${userId}&lesson=${lessonId}`);
+    // Navigate to the new CourseTrack page after feedback
+    if (userId) {
+      window.location.assign(`/courses/CourseTrack?user=${userId}&lesson=${lessonId}`);
+    }
   };
 
   return (

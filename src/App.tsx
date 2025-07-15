@@ -16,6 +16,7 @@ import MissionAccomplished from './pages/lesson/MissionAccomplished';
 import DayStreak from './pages/lesson/DayStreak';
 import LessonFeedback1 from './pages/lesson/LessonFeedback1';
 import LessonFeedback2 from './pages/lesson/LessonFeedback2';
+import CourseTrack from './pages/courses/CourseTrack';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           <Route path="/lesson/lesson-feedback-2" element={<LessonFeedback2 />} />
           <Route path="/lesson/:lessonId" element={<LessonPlayerWrapper />} />
           <Route path="/lesson-builder" element={<LessonBuilder />} />
+          <Route path="/courses/CourseTrack" element={<CourseTrack />} />
         </Routes>
       </Router>
     </AuthProvider>
